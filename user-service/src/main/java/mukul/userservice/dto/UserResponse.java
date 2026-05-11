@@ -1,4 +1,4 @@
-package mukul.food.dto;
+package mukul.userservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

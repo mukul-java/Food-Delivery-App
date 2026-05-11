@@ -1,4 +1,4 @@
-package mukul.food.model;
+package mukul.userservice.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

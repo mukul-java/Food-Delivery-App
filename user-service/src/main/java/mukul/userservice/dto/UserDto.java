@@ -1,10 +1,10 @@
-package mukul.food.dto;
+package mukul.userservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
-import mukul.food.model.Address;
-import mukul.food.model.UserRole;
+import mukul.userservice.model.Address;
+import mukul.userservice.model.UserRole;
 
 @Builder
 @Data

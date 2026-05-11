@@ -1,4 +1,4 @@
-package mukul.food.model;
+package mukul.userservice.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

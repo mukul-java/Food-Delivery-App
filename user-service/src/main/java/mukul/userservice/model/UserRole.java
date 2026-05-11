@@ -1,4 +1,4 @@
-package mukul.food.model;
+package mukul.userservice.model;
 
 public enum UserRole {
     CUSTOMER,

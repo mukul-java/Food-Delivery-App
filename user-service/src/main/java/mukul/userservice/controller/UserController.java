@@ -1,9 +1,9 @@
-package mukul.food.controller;
+package mukul.userservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import mukul.food.dto.UserResponse;
-import mukul.food.model.User;
-import mukul.food.service.UserService;
+import mukul.userservice.dto.UserResponse;
+import mukul.userservice.model.User;
+import mukul.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

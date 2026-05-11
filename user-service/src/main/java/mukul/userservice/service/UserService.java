@@ -1,9 +1,9 @@
-package mukul.food.service;
+package mukul.userservice.service;
 
-import mukul.food.dto.UserDto;
-import mukul.food.dto.UserResponse;
-import mukul.food.model.User;
-import mukul.food.repository.UserRepository;
+import mukul.userservice.dto.UserDto;
+import mukul.userservice.dto.UserResponse;
+import mukul.userservice.model.User;
+import mukul.userservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

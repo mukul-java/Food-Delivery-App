@@ -1,6 +1,6 @@
-package mukul.food.repository;
+package mukul.userservice.repository;
 
-import mukul.food.model.User;
+import mukul.userservice.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface UserRepository extends MongoRepository<User, String> {
