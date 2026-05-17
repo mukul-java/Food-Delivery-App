@@ -1,4 +1,4 @@
-//package mukul.order.config;
+//package mukul.restaurant.config;
 //
 //import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 //import org.springframework.context.annotation.Bean;

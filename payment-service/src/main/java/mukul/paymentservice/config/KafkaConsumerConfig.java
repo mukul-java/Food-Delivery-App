@@ -1,0 +1,36 @@
+package mukul.paymentservice.config;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.listener.DefaultErrorHandler;
+import org.springframework.util.backoff.FixedBackOff;
+
+@Slf4j
+@Configuration
+public class KafkaConsumerConfig {
+
+    @Bean
+    public DefaultErrorHandler errorHandler() {
+
+        return new DefaultErrorHandler(
+
+                (ConsumerRecord<?, ?> record,
+                 Exception exception) -> {
+
+                    log.error(
+                            "Kafka consumer failed for topic={} value={}",
+                            record.topic(),
+                            record.value(),
+                            exception
+                    );
+                },
+
+                new FixedBackOff(
+                        2000L,
+                        3
+                )
+        );
+    }
+}

@@ -1,6 +1,7 @@
 package mukul.order.services;
 
 import lombok.RequiredArgsConstructor;
+import mukul.contracts.events.OrderCreatedEvent;
 import mukul.order.dto.OrderItemDto;
 import mukul.order.dto.OrderResponse;
 import mukul.order.model.Order;
@@ -8,7 +9,7 @@ import mukul.order.model.OrderItem;
 import mukul.order.model.OrderStatus;
 import mukul.order.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,25 +26,41 @@ public class OrderService {
     private OrderRepository orderRepository;
     @Autowired
     private WebClient.Builder webClientBuilder;
-//    private final KafkaTemplate<String, OrderPlacedNotification> kafkaTemplate;
+    @Autowired
+    private final KafkaTemplate<String, OrderCreatedEvent> kafkaTemplate;
+
     public OrderResponse createOrder(Order order) {
         order.setOrderTime(System.currentTimeMillis());
         order.setTotalAmount(totalAmount(order));
         order.setOrderStatus(OrderStatus.PENDING);
-        orderRepository.save(order);
+        Order createdOrder = orderRepository.save(order);
 
+        //EUREKA Http CALL:
         // call FoodItemService to update quantity of items after order is placed
         List<String> foodItemIds = order.getOrderItems().stream().map(OrderItem::getFoodItemId).toList();
         List<Integer> orderQuantities = order.getOrderItems().stream().map(OrderItem::getQuantity).toList();
 
-        webClientBuilder.build().put()
-                .uri("http://restaurant-service/api/v1/fooditem/quantity",
-                        uriBuilder -> uriBuilder
-                                .queryParam("foodItemIds", foodItemIds)
-                                .queryParam("orderQuantities", orderQuantities)
-                                .build())
-                .exchange()
-                .block();
+//        webClientBuilder.build().put()
+//                .uri("http://restaurant-service/api/v1/fooditem/quantity",
+//                        uriBuilder -> uriBuilder
+//                                .queryParam("foodItemIds", foodItemIds)
+//                                .queryParam("orderQuantities", orderQuantities)
+//                                .build())
+//                .exchange()
+//                .block();
+
+        OrderCreatedEvent event =
+                new OrderCreatedEvent(
+                        foodItemIds,
+                        orderQuantities,
+                        createdOrder.getId(),
+                        createdOrder.getTotalAmount(),
+                        createdOrder.getUserId()
+                );
+
+        kafkaTemplate.send(
+                "order-created",
+                event);
 
         return OrderResponse.builder()
                 .orderItems(order.getOrderItems().stream().map(orderItem -> OrderItemDto.builder()

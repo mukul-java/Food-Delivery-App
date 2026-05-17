@@ -12,6 +12,7 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":External-Contracts"))
 
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
@@ -21,13 +22,12 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-
-    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+// disabled eureka discovery
+//    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
-//    implementation("org.springframework.kafka:spring-kafka:3.0.8")
-
+    implementation("org.springframework.kafka:spring-kafka:3.0.8")
 }
 
 tasks.test {

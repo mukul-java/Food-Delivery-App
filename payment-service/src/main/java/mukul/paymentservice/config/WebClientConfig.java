@@ -1,5 +1,4 @@
-//package mukul.order.config;
-//
+//package mukul.paymentservice.config;
 //import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 //import org.springframework.context.annotation.Bean;
 //import org.springframework.context.annotation.Configuration;

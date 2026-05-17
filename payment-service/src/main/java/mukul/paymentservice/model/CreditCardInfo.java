@@ -1,0 +1,21 @@
+package mukul.paymentservice.model;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Data
+@Builder
+@Document(collection = "creditCards")
+public class CreditCardInfo {
+    @Id
+    private String id;
+    private String cardNumber;
+    private String cardHolderName;
+    private String expiryMonth;
+    private String expiryYear;
+    private String securityCode;
+}

@@ -4,7 +4,7 @@ plugins {
     id("java")
 }
 
-group = "mukul.restaurant"
+group = "mukul.food"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -29,4 +29,8 @@ dependencies {
 
     implementation("org.springframework.kafka:spring-kafka:3.0.8")
 
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
