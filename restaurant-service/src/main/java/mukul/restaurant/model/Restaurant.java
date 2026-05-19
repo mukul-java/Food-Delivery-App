@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -23,4 +24,6 @@ public class Restaurant {
     private List<Long> contactInfo;
     private Double rating;
     private OwnerInfo owner;
+    private Date createdAt;
+    private Date updatedAt;
 }

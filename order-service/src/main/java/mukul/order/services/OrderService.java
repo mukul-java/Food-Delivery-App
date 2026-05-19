@@ -1,5 +1,6 @@
 package mukul.order.services;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import mukul.contracts.events.OrderCreatedEvent;
 import mukul.order.dto.OrderItemDto;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +35,7 @@ public class OrderService {
         order.setOrderTime(System.currentTimeMillis());
         order.setTotalAmount(totalAmount(order));
         order.setOrderStatus(OrderStatus.PENDING);
+        order.setCreatedAt(new Date());
         Order createdOrder = orderRepository.save(order);
 
         //EUREKA Http CALL:
@@ -83,6 +86,7 @@ public class OrderService {
                 order.setPaymentId(paymentInfo.get(0));
                 order.setOrderStatus(OrderStatus.COMPLETED);
                 order.setDeliveryTime(order.getOrderTime() + 30*60*1000);
+                order.setUpdatedAt(new Date());
                 orderRepository.save(order);
 
                 // send notification to restaurant
@@ -91,6 +95,7 @@ public class OrderService {
             }
             else {
                 order.setOrderStatus(OrderStatus.CANCELLED);
+                order.setUpdatedAt(new Date());
                 orderRepository.save(order);
             }
         }

@@ -1,5 +1,6 @@
 package mukul.restaurant.service;
 
+import lombok.extern.slf4j.Slf4j;
 import mukul.contracts.events.OrderCreatedEvent;
 import mukul.restaurant.model.FoodItem;
 import mukul.restaurant.model.Restaurant;
@@ -11,9 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FoodItemService {
@@ -106,6 +110,7 @@ public class FoodItemService {
         if (foodItem.isPresent()) {
             FoodItem foodItem1 = foodItem.get();
             foodItem1.setQuantity(foodItem1.getQuantity() - quantity);
+            foodItem1.setUpdatedAt(new Date());
             foodItemRepository.save(foodItem1);
         }
     }
@@ -115,6 +120,7 @@ public class FoodItemService {
             groupId = "restaurant-group"
     )
     public void createOrder(OrderCreatedEvent event) {
+        log.info("Order received at Kafka Listener restaurant-group: "+ event.toString());
         updateFoodItemQuantity(event.getFoodItemIds(), event.getOrderQuantities());
     }
 }

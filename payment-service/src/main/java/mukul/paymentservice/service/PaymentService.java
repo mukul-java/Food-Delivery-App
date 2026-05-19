@@ -11,6 +11,8 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -23,6 +25,7 @@ public class PaymentService {
         //TODO: call some 3rd party to handle payment request
         payment.setTimestamp(System.currentTimeMillis());
         payment.setPaymentStatus(PaymentStatus.APPROVED);
+        payment.setCreatedAt(new Date());
         payment = paymentRepository.save(payment);
 
         // send payment info to order-service

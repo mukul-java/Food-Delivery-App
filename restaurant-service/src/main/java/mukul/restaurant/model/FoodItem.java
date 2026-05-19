@@ -8,6 +8,7 @@ import org.bson.types.Binary;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -22,4 +23,6 @@ public class FoodItem {
     private Binary icon;
     private Integer quantity;
     private String restaurantId;
+    private Date createdAt;
+    private Date updatedAt;
 }

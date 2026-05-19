@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,4 +23,5 @@ public class User {
     private Long phoneNumber;
     private Address address;
     private UserRole userRole;
+    private Date createdAt;
 }

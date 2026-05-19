@@ -24,6 +24,7 @@ public class RestaurantService {
     @Autowired
     private FoodItemRepository foodItemRepository;
 
+    // Eureka http caller
     @Autowired
     private WebClient.Builder webClientBuilder;
 
@@ -71,7 +72,7 @@ public class RestaurantService {
         }
         return RestaurantResponse.builder()
                 .responseCode(404)
-                .msg("Restaurant not found with this id")
+                .msg("Restaurant not found with id: "+ id)
                 .build();
     }
 
