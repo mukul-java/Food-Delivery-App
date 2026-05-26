@@ -2,33 +2,38 @@ package com.mukul.authservice.config;
 
 import com.mukul.authservice.model.UserCredential;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
 
-    private String username;
-    private String password;
+    private UserCredential userCredential;
 
     public CustomUserDetails(UserCredential userCredential) {
-        this.username = userCredential.getUsername();
-        this.password = userCredential.getPassword();
+        this.userCredential = userCredential;
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return List.of(
+                new SimpleGrantedAuthority(
+                        userCredential.getUserRole().name()
+                )
+        );
     }
 
     @Override
     public String getPassword() {
-        return password;
+        return userCredential.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return userCredential.getUsername();
     }
 
     @Override

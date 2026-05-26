@@ -26,6 +26,8 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+
     implementation("org.springframework.kafka:spring-kafka:3.0.8")
 
 }

@@ -8,6 +8,7 @@ import com.mukul.authservice.model.UserRole;
 import com.mukul.authservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,13 +36,18 @@ public class AuthService {
         return "User added to the system";
     }
 
-    public String generateToken(String username) {
-        return jwtService.generateToken(username);
+    public String generateToken(UserDetails userDetails) {
+//        UserCredential user = userRepository.findByUsername(username).orElseThrow();
+        String role = userDetails.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
+        return jwtService.generateToken(userDetails.getUsername(), role);
     }
 
-    public void validateToken(String token) {
-        jwtService.validateToken(token);
-    }
+//    public void validateToken(String token) {
+//        jwtService.validateToken(token, username);
+//    }
 
     public UserResponse getUser(String id) {
         Optional<UserCredential> user = userRepository.findById(id);
