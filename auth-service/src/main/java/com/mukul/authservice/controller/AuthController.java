@@ -24,7 +24,6 @@ public class AuthController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public String createUser(@RequestBody UserCredential user) {
-        System.out.println("Create User");
         return authService.saveUser(user);
     }
 
