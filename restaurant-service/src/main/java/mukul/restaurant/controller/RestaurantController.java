@@ -6,9 +6,13 @@ import mukul.restaurant.dto.RestaurantRequest;
 import mukul.restaurant.dto.RestaurantResponse;
 import mukul.restaurant.service.RestaurantService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+import static org.springframework.security.authorization.AuthorityAuthorizationManager.hasAuthority;
+
+@PreAuthorize("hasRole('RESTAURANT_OWNER')")
 @RestController
 @RequestMapping("api/v1/restaurant")
 @RequiredArgsConstructor
@@ -29,6 +33,7 @@ public class RestaurantController {
         return restaurantService.getAllRestaurants();
     }
 
+    @PreAuthorize("hasAuthority('RESTAURANT_OWNER')")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public RestaurantResponse getRestaurant(@PathVariable("id") String id) {
