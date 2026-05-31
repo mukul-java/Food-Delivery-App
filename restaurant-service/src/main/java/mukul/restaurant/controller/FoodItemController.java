@@ -5,6 +5,7 @@ import mukul.restaurant.dto.FoodItemDto;
 import mukul.restaurant.service.FoodItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,4 +43,10 @@ public class FoodItemController {
         foodItemService.updateFoodItemQuantity(foodItemIds, orderQuantities);
     }
 
+    @GetMapping("/debug")
+    public String debug(Authentication auth) {
+        System.out.println(auth);
+        System.out.println(auth.getAuthorities());
+        return "OK";
+    }
 }

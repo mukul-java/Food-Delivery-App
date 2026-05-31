@@ -7,6 +7,7 @@ import mukul.restaurant.dto.RestaurantResponse;
 import mukul.restaurant.service.RestaurantService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -38,5 +39,12 @@ public class RestaurantController {
     @ResponseStatus(HttpStatus.OK)
     public RestaurantResponse getRestaurant(@PathVariable("id") String id) {
         return restaurantService.getRestaurant(id);
+    }
+
+    @GetMapping("/debug")
+    public String debug(Authentication auth) {
+        System.out.println(auth);
+        System.out.println(auth.getAuthorities());
+        return "OK";
     }
 }
