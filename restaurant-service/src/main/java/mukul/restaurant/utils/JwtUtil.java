@@ -10,7 +10,7 @@ import java.security.Key;
 @Component
 public class JwtUtil {
 
-    private final String SECRET = "my-secret-key-my-secret-key-my-secret-key";
+    private final String SECRET = "mukul-food-delivery-application-secret-key-2026";
 
     private Key getKey() {
         return Keys.hmacShaKeyFor(

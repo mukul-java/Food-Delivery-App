@@ -52,18 +52,13 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     jwtUtil.validateToken(authHeader);
 
                     // extract username
-                    String username =
-                            jwtUtil.extractUserName(authHeader);
+                    String username = jwtUtil.extractUserName(authHeader);
 
                     // extract role
-                    String role =
-                            jwtUtil.extractRole(authHeader);
+                    String role = jwtUtil.extractRole(authHeader);
 
                     // create authorities
-                    List<SimpleGrantedAuthority> authorities =
-                            List.of(
-                                    new SimpleGrantedAuthority(role)
-                            );
+                    List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
                     log.info("Authorities extracted: "+ authorities);
                     // create authentication object
                     Authentication authentication =
@@ -74,8 +69,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                             );
 
                     // store inside security context of the api-gateway service only
-                    SecurityContextHolder.getContext()
-                            .setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
 
                     // optionally forward headers downstream
                     request = exchange.getRequest()

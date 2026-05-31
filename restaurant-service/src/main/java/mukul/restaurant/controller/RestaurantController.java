@@ -26,7 +26,6 @@ public class RestaurantController {
 //        @RequestHeader("loggedInUser") String username) {
 //        return restaurantService.addRestaurant(request, username);
         return restaurantService.addRestaurant(request, "Mukul");
-
     }
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
