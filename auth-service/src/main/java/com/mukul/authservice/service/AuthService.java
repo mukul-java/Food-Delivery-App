@@ -1,7 +1,9 @@
 package com.mukul.authservice.service;
 
+import com.mukul.authservice.ExceptionHandler.GlobalExceptionHandler;
+import com.mukul.authservice.ExceptionHandler.UserAlreadyExistsException;
+import com.mukul.authservice.ExceptionHandler.UserNotFoundException;
 import com.mukul.authservice.dto.UserDto;
-import com.mukul.authservice.dto.UserResponse;
 import com.mukul.authservice.model.DeliveryAgent;
 import com.mukul.authservice.model.UserCredential;
 import com.mukul.authservice.model.UserRole;
@@ -30,10 +32,18 @@ public class AuthService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public String saveUser(UserCredential credential) {
-        credential.setPassword(passwordEncoder.encode(credential.getPassword()));
-        userRepository.save(credential);
-        return "User added to the system";
+    public UserDto saveUser(UserCredential credential) {
+        userRepository.findByUsername(credential.getUsername())
+                .ifPresent(user -> {
+                    throw new UserAlreadyExistsException(
+                            "User already exists with email: " + credential.getUsername()
+                    );
+                });
+
+        credential.setPassword( passwordEncoder.encode(credential.getPassword()));
+        UserCredential savedUser = userRepository.save(credential);
+
+        return mapUserCredentialToUserDto(savedUser);
     }
 
     public String generateToken(UserDetails userDetails) {
@@ -49,56 +59,42 @@ public class AuthService {
 //        jwtService.validateToken(token, username);
 //    }
 
-    public UserResponse getUser(String id) {
-        Optional<UserCredential> user = userRepository.findById(id);
-        if(user.isPresent()) {
-            UserCredential user1 = user.get();
-            return mapUserToUserResponse(user1);
-        }
-        return UserResponse.builder()
-                .responseCode(404)
-                .msg("User with given id is not present")
-                .build();
+    public UserDto getUser(String id) {
+        UserCredential user = userRepository.findById(id).orElseThrow(()->
+                new UserNotFoundException("User not found with id: " + id)
+        );
+        return mapUserCredentialToUserDto(user);
     }
 
-    public UserResponse updateUser(UserCredential user) {
+    public UserDto updateUser(UserCredential user) {
         if(user.getId() == null) {
-            return UserResponse.builder()
-                    .responseCode(400)
-                    .msg("Please provide user id")
-                    .build();
+            throw new RuntimeException("User with given id is null");
         }
-        Optional<UserCredential> userOptional = userRepository.findById(user.getId());
-        if(userOptional.isPresent()) {
-            return updateUser(userOptional.get(), user);
-        }
-        return UserResponse.builder()
-                .responseCode(404)
-                .msg("User with given id is not present")
-                .build();
+        UserCredential existingUser = userRepository.findById(user.getId()).orElseThrow(()->
+                new UserNotFoundException("User not found with id: " +user.getId())
+        );
+
+        UserDto response = updateUser(user, existingUser);
+        return response;
     }
 
-    private UserResponse updateUser(UserCredential user, UserCredential userNew) {
+    private UserDto updateUser(UserCredential user, UserCredential userNew) {
         user.setFullName(userNew.getFullName());
         user.setUsername(userNew.getUsername());
         user.setPhoneNumber(userNew.getPhoneNumber());
         user.setAddress(userNew.getAddress());
         userRepository.save(user);
-        return mapUserToUserResponse(user);
+        return mapUserCredentialToUserDto(user);
     }
 
-    private UserResponse mapUserToUserResponse(UserCredential user1) {
-        return UserResponse.builder()
-                .user(UserDto.builder()
-                        .id(user1.getId())
-                        .fullName(user1.getFullName())
-                        .email(user1.getUsername())
-                        .phoneNumber(user1.getPhoneNumber())
-                        .address(user1.getAddress())
-                        .userRole(user1.getUserRole())
-                        .build())
-                .responseCode(200)
-                .msg("Success")
+    private UserDto mapUserCredentialToUserDto(UserCredential user) {
+        return UserDto.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .email(user.getUsername())
+                .phoneNumber(user.getPhoneNumber())
+                .address(user.getAddress())
+                .userRole(user.getUserRole())
                 .build();
     }
 

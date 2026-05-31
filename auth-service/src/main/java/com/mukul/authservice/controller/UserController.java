@@ -1,6 +1,5 @@
 package com.mukul.authservice.controller;
 
-import com.mukul.authservice.dto.UserResponse;
 import com.mukul.authservice.model.DeliveryAgent;
 import com.mukul.authservice.model.UserCredential;
 import com.mukul.authservice.service.AuthService;

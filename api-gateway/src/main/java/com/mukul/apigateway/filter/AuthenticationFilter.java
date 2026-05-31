@@ -73,22 +73,19 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                                     authorities
                             );
 
-                    // store inside security context
+                    // store inside security context of the api-gateway service only
                     SecurityContextHolder.getContext()
                             .setAuthentication(authentication);
 
                     // optionally forward headers downstream
-                    request = request.mutate()
+                    request = exchange.getRequest()
+                            .mutate()
                             .header("loggedInUser", username)
                             .header("loggedInRole", role)
                             .build();
 
-                    request = exchange.getRequest()
-                            .mutate()
-                            .header("loggedInUser", jwtUtil.extractUserName(authHeader))
-                            .build();
-                } catch (Exception e) {
-                    System.out.println("invalid access...!");
+                }catch (Exception e) {
+                    log.error("Authentication failed", e);
                     throw new RuntimeException("unauthorized access to application");
                 }
             }
