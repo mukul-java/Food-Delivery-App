@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 @Slf4j
 @Service
@@ -27,72 +26,60 @@ public class FoodItemService {
     @Autowired
     private RestaurantRepository restaurantRepository;
 
-    public String addFoodItem(FoodItemDto foodItemDto, String username) {
-        // check if the loggedInUser is same as the restaurant Owner or not
-        try {
-            Restaurant restaurant = restaurantRepository.findById(foodItemDto.getRestaurantId())
-                    .orElseThrow(() -> new RuntimeException("Restaurant not found"));
-            if (!restaurant.getOwner().getUsername().equals(username)) {
-                return "Access Denied...You are not the OWNER of this restaurant";
-            }
-            FoodItem foodItem = FoodItem.builder()
-                    .name(foodItemDto.getName())
-                    .description(foodItemDto.getDescription())
-                    .quantity(foodItemDto.getQuantity())
-                    .icon(foodItemDto.getIcon())
-                    .price(foodItemDto.getPrice())
-                    .restaurantId(foodItemDto.getRestaurantId())
-                    .build();
-            foodItemRepository.save(foodItem);
-            return "Food item added with id: " + foodItem.getId();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public FoodItemDto addFoodItem(FoodItemDto foodItemDto, String username ) {
+
+        Restaurant restaurant = restaurantRepository.findById(foodItemDto.getRestaurantId())
+                        .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+        log.info("Restaurant owner :{}", restaurant.getName());
+        log.info("User Name :" +  username);
+
+        if (!restaurant.getOwner().getUsername().equals(username)) {
+            throw new RuntimeException("Access Denied. Not restaurant owner");
         }
+
+        FoodItem foodItem = convertToFoodItem(foodItemDto);
+
+        foodItem.setCreatedAt(new Date());
+        foodItem.setUpdatedAt(new Date());
+
+        FoodItem savedFoodItem = foodItemRepository.save(foodItem);
+
+        return convertToFoodItemDto(savedFoodItem);
     }
 
-    public List<FoodItemDto> getAllFoodItems(String restaurantId) {
-        try {
-            List<FoodItem> allFoodItems = foodItemRepository.findByRestaurantId(restaurantId);
-            return allFoodItems.stream().map(foodItem ->
-                    FoodItemDto.builder()
-                            .id(foodItem.getId())
-                            .name(foodItem.getName())
-                            .description(foodItem.getDescription())
-                            .icon(foodItem.getIcon())
-                            .quantity(foodItem.getQuantity())
-                            .price(foodItem.getPrice())
-                            .restaurantId(foodItem.getRestaurantId())
-                            .build()).toList();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public List<FoodItemDto> getAllFoodItems( String restaurantId ) {
+
+        return foodItemRepository
+                .findByRestaurantId(restaurantId)
+                .stream()
+                .map(this::convertToFoodItemDto)
+                .toList();
     }
 
-    public String updateFoodItem(FoodItemDto foodItemDto, String username) {
-        try {
-            // check if the loggedInUser is same as the restaurant Owner or not
-            Restaurant restaurant = restaurantRepository.findById(foodItemDto.getRestaurantId()).get();
-            if (!restaurant.getOwner().getUsername().equals(username)) {
-                return "Access Denied...You are not the OWNER of this restaurant";
-            }
-            Optional<FoodItem> foodItem = foodItemRepository.findById(foodItemDto.getId());
-            if (foodItem.isPresent()) {
-                update(foodItem.get(), foodItemDto);
-                return "Updated Successfully";
-            }
-            return "Food Item not present";
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    public FoodItemDto updateFoodItem( FoodItemDto foodItemDto, String username ) {
 
-    private void update(FoodItem item, FoodItemDto foodItemDto) {
-        item.setName(foodItemDto.getName());
-        item.setDescription(foodItemDto.getDescription());
-        item.setIcon(foodItemDto.getIcon());
-        item.setPrice(foodItemDto.getPrice());
-        item.setQuantity(foodItemDto.getQuantity());
-        foodItemRepository.save(item);
+        Restaurant restaurant = restaurantRepository.findById(foodItemDto.getRestaurantId())
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+
+        if (!restaurant.getOwner()
+                .getUsername()
+                .equals(username)) {
+
+            throw new RuntimeException("Access Denied. Not restaurant owner");
+        }
+
+        FoodItem foodItem = foodItemRepository.findById(foodItemDto.getId())
+                .orElseThrow(() -> new RuntimeException("Food item not found"));
+
+        foodItem.setName(foodItemDto.getName());
+        foodItem.setDescription(foodItemDto.getDescription());
+        foodItem.setPrice(foodItemDto.getPrice());
+        foodItem.setQuantity(foodItemDto.getQuantity());
+        foodItem.setUpdatedAt(new Date());
+
+        FoodItem updatedFoodItem = foodItemRepository.save(foodItem);
+
+        return convertToFoodItemDto(updatedFoodItem);
     }
 
     public void updateFoodItemQuantity(List<String> foodItemIds, List<Integer> orderQuantities) {
@@ -113,6 +100,32 @@ public class FoodItemService {
             foodItem1.setUpdatedAt(new Date());
             foodItemRepository.save(foodItem1);
         }
+    }
+
+    //Mappers
+
+    private FoodItemDto convertToFoodItemDto( FoodItem foodItem ) {
+
+        return FoodItemDto.builder()
+                .id(foodItem.getId())
+                .name(foodItem.getName())
+                .description(foodItem.getDescription())
+                .price(foodItem.getPrice())
+                .quantity(foodItem.getQuantity())
+                .restaurantId(foodItem.getRestaurantId())
+                .build();
+    }
+
+    private FoodItem convertToFoodItem( FoodItemDto dto ) {
+
+        return FoodItem.builder()
+                .id(dto.getId())
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .price(dto.getPrice())
+                .quantity(dto.getQuantity())
+                .restaurantId(dto.getRestaurantId())
+                .build();
     }
 
     @KafkaListener(

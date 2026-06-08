@@ -22,6 +22,7 @@ public class Restaurant {
     private String description;
     private Address address;
     private List<Long> contactInfo;
+    private List<FoodItem> foodItems;
     private Double rating;
     private OwnerInfo owner;
     private Date createdAt;

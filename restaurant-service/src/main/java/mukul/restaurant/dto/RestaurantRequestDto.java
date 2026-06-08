@@ -5,20 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import mukul.restaurant.model.Address;
-import mukul.restaurant.model.FoodItem;
 
 import java.util.List;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class RestaurantDto {
-    private String id;
+public class RestaurantRequestDto {
     private String name;
     private String description;
     private Address address;
     private List<Long> contactInfo;
-    private Double rating;
-    private List<FoodItem> foodItems;
 }

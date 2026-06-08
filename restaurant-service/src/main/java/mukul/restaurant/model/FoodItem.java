@@ -20,7 +20,7 @@ public class FoodItem {
     private String name;
     private String description;
     private BigDecimal price;
-    private Binary icon;
+//    private Binary icon;
     private Integer quantity;
     private String restaurantId;
     private Date createdAt;
