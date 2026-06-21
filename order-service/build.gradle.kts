@@ -12,7 +12,6 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":External-Contracts"))
 
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
@@ -34,6 +33,15 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+
+    //redis
+    implementation ("org.springframework.boot:spring-boot-starter-data-redis")
+
+    //avro for external event sharing
+    implementation(project(":External-Contracts"))
+    implementation("io.confluent:kafka-avro-serializer:7.6.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-avro")
+
 }
 
 tasks.test {

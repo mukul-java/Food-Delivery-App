@@ -23,9 +23,9 @@ public class Order {
     private String restaurantId;
     private List<OrderItem> orderItems;
     private BigDecimal totalAmount;
-    private Long orderTime;
+    private Date orderTime;
     private Address address;
-    private Long deliveryTime;
+    private Date deliveryTime;
     private OrderStatus orderStatus;
     private String paymentId;
     private String userId;

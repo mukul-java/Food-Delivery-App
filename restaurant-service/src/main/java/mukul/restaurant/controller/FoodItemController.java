@@ -5,6 +5,7 @@ import mukul.restaurant.dto.ApiResponse;
 import mukul.restaurant.dto.FoodItemDto;
 import mukul.restaurant.service.FoodItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,7 +40,7 @@ public class FoodItemController {
 
     @GetMapping("/{restaurantId}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ApiResponse<List<FoodItemDto>>> getAllFoodItems(@PathVariable("restaurantId") String restaurantId) {
+    public ResponseEntity<ApiResponse<List<FoodItemDto>>> getFoodItems(@PathVariable("restaurantId") String restaurantId) {
         List<FoodItemDto> response = foodItemService.getAllFoodItems(restaurantId);
         return ResponseEntity.ok(
                 ApiResponse.<List<FoodItemDto>>builder()
@@ -51,6 +52,19 @@ public class FoodItemController {
         );
     }
 
+    // Get all food items irrespective of restaurant.
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ApiResponse<Page<FoodItemDto>>> getAllFoodItems(@RequestParam int page, int size) {
+        Page<FoodItemDto> response = foodItemService.getAllFoodItems(page, size);
+        return ResponseEntity.ok(
+                ApiResponse.<Page<FoodItemDto>>builder()
+                        .success(true)
+                        .message("Food items fetched successfully")
+                        .data(response)
+                        .build()
+        );
+    }
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponse<FoodItemDto>> updateFoodItem(@RequestBody FoodItemDto foodItemDto,

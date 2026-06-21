@@ -1,0 +1,12 @@
+rootProject.name = "FoodDeliveryApplication"
+include("api-gateway")
+include("auth-service")
+include("delivery-service")
+include("untitled")
+include("order-service")
+include("user-service")
+include("restaurant-service")
+include("payment-service")
+include("discovery-service")
+include("delivery-service")
+include("External-Contracts")

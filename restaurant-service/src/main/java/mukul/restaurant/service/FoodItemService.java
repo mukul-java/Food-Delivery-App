@@ -9,6 +9,9 @@ import mukul.restaurant.repository.RestaurantRepository;
 import mukul.restaurant.dto.FoodItemDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +34,7 @@ public class FoodItemService {
         Restaurant restaurant = restaurantRepository.findById(foodItemDto.getRestaurantId())
                         .orElseThrow(() -> new RuntimeException("Restaurant not found"));
         log.info("Restaurant owner :{}", restaurant.getName());
-        log.info("User Name :" +  username);
+        log.info("User Name : {}", username);
 
         if (!restaurant.getOwner().getUsername().equals(username)) {
             throw new RuntimeException("Access Denied. Not restaurant owner");
@@ -56,15 +59,20 @@ public class FoodItemService {
                 .toList();
     }
 
+    // get all food items in the database.
+    public Page<FoodItemDto> getAllFoodItems(int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<FoodItem> foodItems = foodItemRepository.findAll(pageable);
+        return foodItems.map(this::convertToFoodItemDto);
+    }
+
     public FoodItemDto updateFoodItem( FoodItemDto foodItemDto, String username ) {
 
         Restaurant restaurant = restaurantRepository.findById(foodItemDto.getRestaurantId())
                 .orElseThrow(() -> new RuntimeException("Restaurant not found"));
 
-        if (!restaurant.getOwner()
-                .getUsername()
-                .equals(username)) {
-
+        if (!restaurant.getOwner().getUsername().equals(username)) {
             throw new RuntimeException("Access Denied. Not restaurant owner");
         }
 
@@ -102,7 +110,7 @@ public class FoodItemService {
         }
     }
 
-    //Mappers
+    //Mappers and helper classes:
 
     private FoodItemDto convertToFoodItemDto( FoodItem foodItem ) {
 

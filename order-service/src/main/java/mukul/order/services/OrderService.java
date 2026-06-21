@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,8 @@ public class OrderService {
     private final KafkaTemplate<String, OrderCreatedEvent> kafkaTemplate;
 
     public OrderResponse createOrder(Order order) {
-        order.setOrderTime(System.currentTimeMillis());
+//        if(order.getRestaurantId())
+        order.setOrderTime(new Date());
         order.setTotalAmount(totalAmount(order));
         order.setOrderStatus(OrderStatus.PENDING);
         order.setCreatedAt(new Date());
@@ -56,14 +58,13 @@ public class OrderService {
                 new OrderCreatedEvent(
                         foodItemIds,
                         orderQuantities,
+                        order.getRestaurantId(),
                         createdOrder.getId(),
                         createdOrder.getTotalAmount(),
                         createdOrder.getUserId()
                 );
 
-        kafkaTemplate.send(
-                "order-created",
-                event);
+        kafkaTemplate.send("order-created", event);
 
         return OrderResponse.builder()
                 .orderItems(order.getOrderItems().stream().map(orderItem -> OrderItemDto.builder()
@@ -85,7 +86,7 @@ public class OrderService {
             if(paymentInfo.get(2).equals("SUCCESS")) {
                 order.setPaymentId(paymentInfo.get(0));
                 order.setOrderStatus(OrderStatus.COMPLETED);
-                order.setDeliveryTime(order.getOrderTime() + 30*60*1000);
+                order.setDeliveryTime(new Date(order.getOrderTime().getTime() + 30 * 60 * 1000));
                 order.setUpdatedAt(new Date());
                 orderRepository.save(order);
 

@@ -1,5 +1,9 @@
 package mukul.restaurant.service;
 
+import jakarta.annotation.PostConstruct;
+import mukul.contracts.events.OrderCreatedEvent;
+import mukul.contracts.events.RestaurantCacheEvent;
+import mukul.contracts.events.RestaurantOperation;
 import mukul.restaurant.dto.FoodItemDto;
 import mukul.restaurant.dto.RestaurantRequestDto;
 import mukul.restaurant.dto.RestaurantResponseDto;
@@ -13,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,12 +30,20 @@ public class RestaurantService {
     private RestaurantRepository restaurantRepository;
     @Autowired
     private FoodItemRepository foodItemRepository;
+    @Autowired
+    private final KafkaTemplate<String, RestaurantCacheEvent> kafkaTemplate;
+
+    // This executes after dependency injection.
+    @PostConstruct
+    public void init() {
+        publishAllRestaurantsToCacheTopic();
+    }
 
 //    // Eureka http caller
 //    @Autowired
 //    private WebClient.Builder webClientBuilder;
 
-    private final String ROLE = "RESTAURANT_OWNER";
+//    private final String ROLE = "RESTAURANT_OWNER";
 
     public RestaurantResponseDto addRestaurant(RestaurantRequestDto request, String username) {
         // check if loggedInUser is a RESTAURANT_OWNER, fetch ownerInfo from auth-service
@@ -83,6 +96,23 @@ public class RestaurantService {
                 .map(this::convertToRestaurantResponseDto)
                 .toList();
     }
+
+    // Cache publisher:
+    public void publishAllRestaurantsToCacheTopic() {
+        List<Restaurant> restaurants = restaurantRepository.findAll();
+
+        restaurants.forEach(r -> {
+            RestaurantCacheEvent event =
+                    RestaurantCacheEvent.newBuilder()
+                            .setRestaurantId(r.getId())
+                            .setRestaurantName(r.getName())
+                            .setOperation(RestaurantOperation.SYNC)
+                            .build();
+
+            kafkaTemplate.send("restaurant-cache-sync", event );
+        });
+    }
+
 
     // Helper methods:
     private FoodItemDto convertToFoodItemResponse(FoodItem foodItem) {
