@@ -5,7 +5,10 @@ import mukul.deliveryservice.model.DeliveryAssignment;
 import mukul.deliveryservice.model.OrderDetails;
 import mukul.deliveryservice.model.OrderStatus;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
@@ -13,18 +16,26 @@ import org.springframework.web.util.UriBuilder;
 @Service
 @RequiredArgsConstructor
 public class DeliveryService {
-    @Autowired
-    private WebClient.Builder webClientBuilder;
+
+//    @Autowired
+//    private WebClient.Builder webClientBuilder;
+
+//    @Autowired
+//    private final KafkaTemplate<String, > kafkaTemplate;
+
     public String deliverOrder(String orderId) {
         // update order status to delivered
-        webClientBuilder.build().put()
-                .uri("http://order-service/api/v1/order/status",
-                        uriBuilder -> uriBuilder
-                                .queryParam("orderId", orderId)
-                                .build())
-                .bodyValue(OrderStatus.DELIVERED)
-                .exchange()
-                .block();
+
+//        webClientBuilder.build().put()
+//                .uri("http://order-service/api/v1/order/status",
+//                        uriBuilder -> uriBuilder
+//                                .queryParam("orderId", orderId)
+//                                .build())
+//                .bodyValue(OrderStatus.DELIVERED)
+//                .exchange()
+//                .block();
+
+//        kafkaTemplate.send("order-created", event);
         return "Order with id: " + orderId + " delivered";
     }
 
@@ -35,24 +46,24 @@ public class DeliveryService {
         createNewAssignment(new OrderDetails());
      }
      private void createNewAssignment(OrderDetails orderDetails) {
-        // search for a delivery Agent - talk to auth service for that
-        DeliveryAgent[] deliveryAgents = webClientBuilder.build().get()
-                .uri("http://auth-service/api/v1/user/delivery",
-                        UriBuilder::build)
-                .retrieve()
-                .bodyToMono(DeliveryAgent[].class)
-                .block();
-        
-        // TODO: sort these agents based on the distance between there current location and restaurant location
-         DeliveryAssignment deliveryAssignment = DeliveryAssignment.builder()
-                 .deliveryAgentName(deliveryAgents[0].getName())
-                 .deliveryAgentCurrentAddress(deliveryAgents[0].getAddress())
-                 .deliveryAgentPhoneNumber(deliveryAgents[0].getPhoneNumber())
-                 .orderDetails(orderDetails)
-                 .build();
-         
-         // TODO: send a notification to deliveryAgent that an order is assigned
-         // TODO: if agent accepts the assignment track his location
+//        // search for a delivery Agent - talk to auth service for that
+//        DeliveryAgent[] deliveryAgents = webClientBuilder.build().get()
+//                .uri("http://auth-service/api/v1/user/delivery",
+//                        UriBuilder::build)
+//                .retrieve()
+//                .bodyToMono(DeliveryAgent[].class)
+//                .block();
+//
+//        // TODO: sort these agents based on the distance between there current location and restaurant location
+//         DeliveryAssignment deliveryAssignment = DeliveryAssignment.builder()
+//                 .deliveryAgentName(deliveryAgents[0].getName())
+//                 .deliveryAgentCurrentAddress(deliveryAgents[0].getAddress())
+//                 .deliveryAgentPhoneNumber(deliveryAgents[0].getPhoneNumber())
+//                 .orderDetails(orderDetails)
+//                 .build();
+//
+//         // TODO: send a notification to deliveryAgent that an order is assigned
+//         // TODO: if agent accepts the assignment track his location
     }
 
     public void callCustomer() {

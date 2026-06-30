@@ -35,6 +35,23 @@ public class RestaurantController {
                 );
     }
 
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ApiResponse<RestaurantResponseDto>>
+    updateRestaurant(
+            @PathVariable String id, @RequestBody RestaurantRequestDto request) {
+
+        RestaurantResponseDto response = restaurantService.updateRestaurant(id, request);
+
+        return ResponseEntity.ok(
+                ApiResponse.<RestaurantResponseDto>builder()
+                        .success(true)
+                        .message("Restaurant updated successfully")
+                        .data(response)
+                        .build()
+        );
+    }
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponse<List<RestaurantResponseDto>>> getAllRestaurants() {

@@ -1,13 +1,10 @@
 package mukul.restaurant.service;
 
-import jakarta.annotation.PostConstruct;
-import mukul.contracts.events.OrderCreatedEvent;
-import mukul.contracts.events.RestaurantCacheEvent;
-import mukul.contracts.events.RestaurantOperation;
 import mukul.restaurant.dto.FoodItemDto;
 import mukul.restaurant.dto.RestaurantRequestDto;
 import mukul.restaurant.dto.RestaurantResponseDto;
 import mukul.restaurant.exception.RestaurantNotFound;
+import mukul.restaurant.kafka.RestaurantKafkaService;
 import mukul.restaurant.model.FoodItem;
 import mukul.restaurant.model.OwnerInfo;
 import mukul.restaurant.model.Restaurant;
@@ -17,9 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -31,18 +26,11 @@ public class RestaurantService {
     @Autowired
     private FoodItemRepository foodItemRepository;
     @Autowired
-    private final KafkaTemplate<String, RestaurantCacheEvent> kafkaTemplate;
-
-    // This executes after dependency injection.
-    @PostConstruct
-    public void init() {
-        publishAllRestaurantsToCacheTopic();
-    }
+    private final RestaurantKafkaService restaurantKafkaService;
 
 //    // Eureka http caller
 //    @Autowired
 //    private WebClient.Builder webClientBuilder;
-
 //    private final String ROLE = "RESTAURANT_OWNER";
 
     public RestaurantResponseDto addRestaurant(RestaurantRequestDto request, String username) {
@@ -75,7 +63,29 @@ public class RestaurantService {
 
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
         log.info("Restaurant saved successfully: {}", savedRestaurant);
+        restaurantKafkaService.publishRestaurantCreated(savedRestaurant);
         return convertToRestaurantResponseDto(savedRestaurant);
+    }
+
+    public RestaurantResponseDto updateRestaurant(
+            String id,
+            RestaurantRequestDto request) {
+
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() ->
+                        new RestaurantNotFound("Restaurant not found"));
+
+        restaurant.setName(request.getName());
+        restaurant.setDescription(request.getDescription());
+        restaurant.setAddress(request.getAddress());
+        restaurant.setContactInfo(request.getContactInfo());
+
+        Restaurant updatedRestaurant =
+                restaurantRepository.save(restaurant);
+
+        restaurantKafkaService.publishRestaurantUpdated(updatedRestaurant);
+
+        return convertToRestaurantResponseDto(updatedRestaurant);
     }
 
     public RestaurantResponseDto getRestaurant(String id) {
@@ -100,17 +110,7 @@ public class RestaurantService {
     // Cache publisher:
     public void publishAllRestaurantsToCacheTopic() {
         List<Restaurant> restaurants = restaurantRepository.findAll();
-
-        restaurants.forEach(r -> {
-            RestaurantCacheEvent event =
-                    RestaurantCacheEvent.newBuilder()
-                            .setRestaurantId(r.getId())
-                            .setRestaurantName(r.getName())
-                            .setOperation(RestaurantOperation.SYNC)
-                            .build();
-
-            kafkaTemplate.send("restaurant-cache-sync", event );
-        });
+        restaurants.forEach(restaurantKafkaService::publishRestaurantSync);
     }
 
 
