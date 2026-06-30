@@ -40,7 +40,8 @@ public class AuthService {
                     );
                 });
 
-        credential.setPassword( passwordEncoder.encode(credential.getPassword()));
+//        credential.setPassword( passwordEncoder.encode(credential.getPassword()));
+        credential.setPassword(credential.getPassword());
         UserCredential savedUser = userRepository.save(credential);
 
         return mapUserCredentialToUserDto(savedUser);
