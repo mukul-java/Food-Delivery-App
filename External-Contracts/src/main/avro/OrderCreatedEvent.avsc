@@ -1,0 +1,42 @@
+{
+  "type": "record",
+  "namespace": "mukul.contracts.events",
+  "name": "OrderCreatedEvent",
+  "fields": [
+    {
+      "name": "foodItemIds",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    },
+    {
+      "name": "orderQuantities",
+      "type": {
+        "type": "array",
+        "items": "int"
+      }
+    },
+    {
+      "name": "restaurantId",
+      "type": "string"
+    },
+    {
+      "name": "orderId",
+      "type": "string"
+    },
+    {
+      "name": "amount",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 10,
+        "scale": 2
+      }
+    },
+    {
+      "name": "userId",
+      "type": "string"
+    }
+  ]
+}
