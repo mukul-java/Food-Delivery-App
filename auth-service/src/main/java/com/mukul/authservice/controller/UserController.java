@@ -24,7 +24,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ApiResponse<UserDto>> getUser(@PathVariable("id") String id, @RequestHeader("loggedInUser") String username) {
+    public ResponseEntity<ApiResponse<UserDto>> getUser(@PathVariable("id") long id, @RequestHeader("loggedInUser") String username) {
         log("Get user with username: "+ username);
         UserDto response = authService.getUser(id);
         return ResponseEntity.ok(

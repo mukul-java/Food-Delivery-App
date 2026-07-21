@@ -1,6 +1,7 @@
 package mukul.order.controller;
 
-import mukul.order.dto.OrderResponse;
+import mukul.order.dto.OrderRequestDto;
+import mukul.order.dto.OrderResponseDto;
 import mukul.order.model.Order;
 import mukul.order.model.OrderStatus;
 import mukul.order.services.OrderService;
@@ -17,7 +18,7 @@ public class OrderController {
     private OrderService orderService;
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public OrderResponse placeOrder(@RequestBody Order order) {
+    public OrderResponseDto placeOrder(@RequestBody OrderRequestDto order) {
         return orderService.createOrder(order);
     }
 

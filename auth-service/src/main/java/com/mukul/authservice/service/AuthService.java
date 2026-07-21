@@ -40,8 +40,9 @@ public class AuthService {
                     );
                 });
 
-//        credential.setPassword( passwordEncoder.encode(credential.getPassword()));
-        credential.setPassword(credential.getPassword());
+        // Encrypt the password before saving
+        credential.setPassword( passwordEncoder.encode(credential.getPassword()));
+//        credential.setPassword(credential.getPassword());
         UserCredential savedUser = userRepository.save(credential);
 
         return mapUserCredentialToUserDto(savedUser);
@@ -60,7 +61,7 @@ public class AuthService {
 //        jwtService.validateToken(token, username);
 //    }
 
-    public UserDto getUser(String id) {
+    public UserDto getUser(long id) {
         UserCredential user = userRepository.findById(id).orElseThrow(()->
                 new UserNotFoundException("User not found with id: " + id)
         );
@@ -68,7 +69,7 @@ public class AuthService {
     }
 
     public UserDto updateUser(UserCredential user) {
-        if(user.getId() == null) {
+        if(user.getId() == null){
             throw new RuntimeException("User with given id is null");
         }
         UserCredential existingUser = userRepository.findById(user.getId()).orElseThrow(()->
