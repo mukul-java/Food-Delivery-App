@@ -1,10 +1,10 @@
 package mukul.restaurant.repository;
 
 import mukul.restaurant.model.FoodItem;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface FoodItemRepository extends MongoRepository<FoodItem, String> {
-    List<FoodItem> findByRestaurantId(String restaurantId);
+public interface FoodItemRepository extends JpaRepository<FoodItem, String> {
+    List<FoodItem> findByRestaurant_Id(String restaurantId);
 }

@@ -1,30 +1,67 @@
 package mukul.restaurant.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 @Builder
-@Document(collection = "restaurants")
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(
+        name = "restaurants",
+        indexes = {
+                @Index(name = "idx_restaurant_name", columnList = "name")
+        }
+)
 public class Restaurant {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "description", length = 1000)
     private String description;
+
+    @Embedded
     private Address address;
-    private List<Long> contactInfo;
-    private List<FoodItem> foodItems;
+
+    @Builder.Default
+    @ElementCollection
+    @CollectionTable(
+            name = "restaurant_contacts",
+            joinColumns = @JoinColumn(name = "restaurant_id")
+    )
+    @Column(name = "contact_number")
+    private List<Long> contactInfo = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(
+            mappedBy = "restaurant",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<FoodItem> foodItems = new ArrayList<>();
+
+    @Column(name = "rating")
     private Double rating;
+
+    @Embedded
     private OwnerInfo owner;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", nullable = false)
     private Date createdAt;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_at")
     private Date updatedAt;
 }

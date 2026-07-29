@@ -61,6 +61,9 @@ public class RestaurantService {
                 )
                 .build();
 
+        restaurant.setCreatedAt(new java.util.Date());
+        restaurant.setUpdatedAt(new java.util.Date());
+
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
         log.info("Restaurant saved successfully: {}", savedRestaurant);
         restaurantKafkaService.publishRestaurantCreated(savedRestaurant);
@@ -79,6 +82,7 @@ public class RestaurantService {
         restaurant.setDescription(request.getDescription());
         restaurant.setAddress(request.getAddress());
         restaurant.setContactInfo(request.getContactInfo());
+        restaurant.setUpdatedAt(new java.util.Date());
 
         Restaurant updatedRestaurant =
                 restaurantRepository.save(restaurant);
@@ -92,7 +96,7 @@ public class RestaurantService {
         Restaurant restaurant = restaurantRepository.findById(id)
                 .orElseThrow(() -> new RestaurantNotFound("Restaurant not found."));
 
-        List<FoodItemDto> foodItems = foodItemRepository.findByRestaurantId(id)
+        List<FoodItemDto> foodItems = foodItemRepository.findByRestaurant_Id(id)
                 .stream()
                 .map(this::convertToFoodItemResponse)
                 .toList();
@@ -122,13 +126,13 @@ public class RestaurantService {
                .description(foodItem.getDescription())
                .price(foodItem.getPrice())
                .quantity(foodItem.getQuantity())
-               .restaurantId(foodItem.getRestaurantId())
+               .restaurantId(foodItem.getRestaurant().getId())
                .build();
     }
 
     private RestaurantResponseDto convertToRestaurantResponseDto(Restaurant savedRestaurant) {
         List<FoodItemDto> foodItems = foodItemRepository
-                        .findByRestaurantId(savedRestaurant.getId())
+                        .findByRestaurant_Id(savedRestaurant.getId())
                         .stream()
                         .map(this::convertToFoodItemResponse)
                         .toList();

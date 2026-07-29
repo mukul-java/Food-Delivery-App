@@ -3,7 +3,7 @@ package mukul.restaurant.controller;
 import lombok.RequiredArgsConstructor;
 import mukul.restaurant.dto.ApiResponse;
 import mukul.restaurant.dto.FoodItemDto;
-import mukul.restaurant.service.FoodItemService;
+import mukul.restaurant.service.FoodItemServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ import java.util.List;
 @PreAuthorize("hasAuthority('RESTAURANT_OWNER')")
 public class FoodItemController {
     @Autowired
-    private FoodItemService foodItemService;
+    private FoodItemServiceImpl foodItemService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
