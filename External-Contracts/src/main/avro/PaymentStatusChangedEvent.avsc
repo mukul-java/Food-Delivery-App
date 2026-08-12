@@ -1,0 +1,101 @@
+{
+  "type": "record",
+  "namespace": "mukul.contracts.events",
+  "name": "PaymentStatusChangedEvent",
+  "fields": [
+    {
+      "name": "paymentId",
+      "type": "string"
+    },
+    {
+      "name": "orderId",
+      "type": "string"
+    },
+    {
+      "name": "userId",
+      "type": "string"
+    },
+    {
+      "name": "status",
+      "type": {
+        "type": "enum",
+        "name": "PaymentStatus",
+        "symbols": [
+          "CREATED",
+          "PENDING",
+          "SUCCESS",
+          "FAILED",
+          "CANCELLED",
+          "EXPIRED"
+        ]
+      }
+    },
+    {
+      "name": "amount",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 10,
+        "scale": 2
+      }
+    },
+    {
+      "name": "currency",
+      "type": {
+        "type": "enum",
+        "name": "Currency",
+        "symbols": [
+          "INR",
+          "USD",
+          "EUR",
+          "GBP"
+        ]
+      }
+    },
+    {
+      "name": "gateway",
+      "type": {
+        "type": "enum",
+        "name": "PaymentGateway",
+        "symbols": [
+          "RAZORPAY",
+          "STRIPE"
+        ]
+      }
+    },
+    {
+      "name": "paymentMethod",
+      "type": [
+        "null",
+        {
+          "type": "enum",
+          "name": "PaymentMethod",
+          "symbols": [
+            "UPI",
+            "CARD",
+            "NET_BANKING",
+            "WALLET",
+            "CREDIT_CARD",
+            "DEBIT_CARD",
+            "CASH"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "transactionId",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "eventTime",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    }
+  ]
+}

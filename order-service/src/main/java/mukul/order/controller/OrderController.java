@@ -2,9 +2,9 @@ package mukul.order.controller;
 
 import mukul.order.dto.OrderRequestDto;
 import mukul.order.dto.OrderResponseDto;
-import mukul.order.model.Order;
 import mukul.order.model.OrderStatus;
-import mukul.order.services.OrderService;
+import mukul.order.services.OrderServiceImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class OrderController {
     @Autowired
-    private OrderService orderService;
+    private OrderServiceImpl orderService;
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OrderResponseDto placeOrder(@RequestBody OrderRequestDto order) {
@@ -26,5 +26,25 @@ public class OrderController {
     @ResponseStatus(HttpStatus.OK)
     public void updateOrderStatus(@RequestParam String orderId,  @RequestBody OrderStatus orderStatus) {
         orderService.updateOrderStatus(orderId, orderStatus);
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public Page<OrderResponseDto> getAllOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        return orderService.getAllOrders(page, pageSize);
+    }
+
+    @GetMapping("/{orderId}")
+    @ResponseStatus(HttpStatus.OK)
+    public OrderResponseDto getOrderById(@PathVariable String orderId) {
+        return orderService.getOrderById(orderId);
+    }
+
+    @GetMapping("/stats")
+    @ResponseStatus(HttpStatus.OK)
+    public OrderRequestDto getOrderStats() {
+        return orderService.getOrderStats();
     }
 }

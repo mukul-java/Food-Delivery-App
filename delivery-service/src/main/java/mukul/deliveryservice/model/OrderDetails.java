@@ -1,13 +1,14 @@
 package mukul.deliveryservice.model;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 
-// This detail will be sent by order-service to deliveryService
-@AllArgsConstructor
+@Getter
+@Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class OrderDetails {
     private String restaurantName;
     private Address restaurantAddress;

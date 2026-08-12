@@ -1,15 +1,33 @@
 package mukul.order.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@Document
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "order_items",
+        indexes = {
+                @Index(name = "idx_order_item_food_id", columnList = "food_item_id")
+        })
 public class OrderItem {
-    private String name;
-    private Integer price;
-    private Integer quantity;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "food_item_id", nullable = false)
     private String foodItemId;
+
+    @Column(name = "food_name", nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private Integer price;
+
+    @Column(nullable = false)
+    private Integer quantity;
 }

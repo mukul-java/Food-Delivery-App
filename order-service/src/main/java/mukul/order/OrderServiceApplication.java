@@ -1,7 +1,7 @@
 package mukul.order;
 
 import lombok.extern.slf4j.Slf4j;
-import mukul.order.services.OrderService;
+import mukul.order.services.OrderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,7 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class OrderServiceApplication {
 
     @Autowired
-    private OrderService orderService;
+    private OrderServiceImpl orderService;
 
     public static void main(String[] args) {
         SpringApplication.run(OrderServiceApplication.class, args);

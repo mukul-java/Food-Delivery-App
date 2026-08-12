@@ -1,11 +1,14 @@
 package mukul.order.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
+@Getter
+@Setter
 @Builder
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderItemDto {
+    private String foodItemId;
     private String name;
     private Integer price;
     private Integer quantity;

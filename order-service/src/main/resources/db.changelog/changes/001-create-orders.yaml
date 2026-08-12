@@ -1,0 +1,115 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: mukul
+
+      changes:
+        - createTable:
+            tableName: orders
+
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(36)
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_orders
+                    nullable: false
+
+              - column:
+                  name: order_number
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_order_number
+
+              - column:
+                  name: restaurant_id
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: total_amount
+                  type: DECIMAL(12,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: order_time
+                  type: DATETIME
+
+              - column:
+                  name: address
+                  type: VARCHAR(255)
+
+              - column:
+                  name: city
+                  type: VARCHAR(100)
+
+              - column:
+                  name: state
+                  type: VARCHAR(100)
+
+              - column:
+                  name: zipcode
+                  type: INT
+
+              - column:
+                  name: delivery_time
+                  type: DATETIME
+
+              - column:
+                  name: order_status
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: payment_id
+                  type: VARCHAR(100)
+
+              - column:
+                  name: user_id
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: updated_at
+                  type: DATETIME
+
+        - createIndex:
+            tableName: orders
+            indexName: idx_order_number
+            columns:
+              - column:
+                  name: order_number
+
+        - createIndex:
+            tableName: orders
+            indexName: idx_order_status
+            columns:
+              - column:
+                  name: order_status
+
+        - createIndex:
+            tableName: orders
+            indexName: idx_order_user
+            columns:
+              - column:
+                  name: user_id
+
+        - createIndex:
+            tableName: orders
+            indexName: idx_order_restaurant
+            columns:
+              - column:
+                  name: restaurant_id

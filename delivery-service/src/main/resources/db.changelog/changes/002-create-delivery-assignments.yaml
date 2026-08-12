@@ -1,0 +1,159 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: mukul
+
+      changes:
+        - createTable:
+            tableName: delivery_assignments
+
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_delivery_assignments
+                    nullable: false
+
+              - column:
+                  name: order_number
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: delivery_agent_name
+                  type: VARCHAR(255)
+
+              - column:
+                  name: delivery_agent_phone_number
+                  type: BIGINT
+
+              - column:
+                  name: agent_address
+                  type: VARCHAR(255)
+
+              - column:
+                  name: agent_city
+                  type: VARCHAR(100)
+
+              - column:
+                  name: agent_state
+                  type: VARCHAR(100)
+
+              - column:
+                  name: agent_zipcode
+                  type: INT
+
+              - column:
+                  name: restaurant_name
+                  type: VARCHAR(255)
+
+              - column:
+                  name: restaurant_address
+                  type: VARCHAR(255)
+
+              - column:
+                  name: restaurant_city
+                  type: VARCHAR(100)
+
+              - column:
+                  name: restaurant_state
+                  type: VARCHAR(100)
+
+              - column:
+                  name: restaurant_zipcode
+                  type: INT
+
+              - column:
+                  name: customer_name
+                  type: VARCHAR(255)
+
+              - column:
+                  name: customer_phone_number
+                  type: BIGINT
+
+              - column:
+                  name: customer_address
+                  type: VARCHAR(255)
+
+              - column:
+                  name: customer_city
+                  type: VARCHAR(100)
+
+              - column:
+                  name: customer_state
+                  type: VARCHAR(100)
+
+              - column:
+                  name: customer_zipcode
+                  type: INT
+
+              - column:
+                  name: delivery_time
+                  type: BIGINT
+
+              - column:
+                  name: status
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: updated_at
+                  type: DATETIME
+
+              - column:
+                  name: created_by
+                  type: VARCHAR(100)
+
+              - column:
+                  name: updated_by
+                  type: VARCHAR(100)
+
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+        - createIndex:
+            tableName: delivery_assignments
+            indexName: idx_delivery_assignment_order_number
+
+            columns:
+              - column:
+                  name: order_number
+
+        - createIndex:
+            tableName: delivery_assignments
+            indexName: idx_delivery_assignment_status
+
+            columns:
+              - column:
+                  name: status
+
+        - createIndex:
+            tableName: delivery_assignments
+            indexName: idx_delivery_assignment_agent_phone
+
+            columns:
+              - column:
+                  name: delivery_agent_phone_number
+
+        - createIndex:
+            tableName: delivery_assignments
+            indexName: idx_delivery_assignment_customer_phone
+
+            columns:
+              - column:
+                  name: customer_phone_number

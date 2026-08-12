@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: mukul
+
+      changes:
+        - createTable:
+            tableName: delivery_agents
+
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_delivery_agents
+                    nullable: false
+
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: address
+                  type: VARCHAR(255)
+
+              - column:
+                  name: city
+                  type: VARCHAR(100)
+
+              - column:
+                  name: state
+                  type: VARCHAR(100)
+
+              - column:
+                  name: zipcode
+                  type: INT
+
+              - column:
+                  name: phone_number
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_delivery_agent_phone
+
+        - createIndex:
+            tableName: delivery_agents
+            indexName: idx_delivery_agent_phone
+
+            columns:
+              - column:
+                  name: phone_number
+
+        - createIndex:
+            tableName: delivery_agents
+            indexName: idx_delivery_agent_name
+
+            columns:
+              - column:
+                  name: name

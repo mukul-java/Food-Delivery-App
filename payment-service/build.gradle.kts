@@ -18,6 +18,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("com.mysql:mysql-connector-j")
 
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
     // Database Migration
     implementation("org.liquibase:liquibase-core")
 
@@ -36,7 +38,8 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
-    // Avro
+    //avro for external event sharing
+    implementation(project(":External-Contracts"))
     implementation("io.confluent:kafka-avro-serializer:7.6.0")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-avro")
 

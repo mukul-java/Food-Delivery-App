@@ -3,7 +3,6 @@ package mukul.deliveryservice.service;
 import mukul.deliveryservice.model.DeliveryAgent;
 import mukul.deliveryservice.model.DeliveryAssignment;
 import mukul.deliveryservice.model.OrderDetails;
-import mukul.deliveryservice.model.OrderStatus;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.beans.factory.annotation.Autowired;
