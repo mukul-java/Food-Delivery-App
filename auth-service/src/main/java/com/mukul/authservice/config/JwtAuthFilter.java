@@ -33,30 +33,39 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // Check Bearer token
         if(authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            username = jwtService.extractUsername(token);
+            try {
+                username = jwtService.extractUsername(token);
+            } catch (io.jsonwebtoken.ExpiredJwtException e) {
+                logger.warn("JWT token expired: " + e.getMessage());
+            } catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
+                logger.warn("Invalid JWT token: " + e.getMessage());
+            }
         }
 
         // authenticate only if user not already authenticated
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            try {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                if(jwtService.validateToken(token, userDetails)) {
 
-            if(jwtService.validateToken(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
 
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request)
+                    );
 
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
-                );
-
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authToken);
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authToken);
+                }
+            } catch (Exception e) {
+                logger.error("Could not set user authentication in security context", e);
             }
         }
         filterChain.doFilter(request, response);

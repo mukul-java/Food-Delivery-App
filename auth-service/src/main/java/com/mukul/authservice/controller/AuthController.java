@@ -15,6 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import com.mukul.authservice.config.CustomUserDetails;
+
 @RestController
 @RequestMapping("api/v1/auth")
 public class AuthController {
@@ -39,15 +41,24 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> getToken(@RequestBody AuthRequest authRequest) {
+        String identity = authRequest.getIdentity();
         Authentication authenticate = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(identity, authRequest.getPassword())
         );
         UserDetails userDetails = (UserDetails) authenticate.getPrincipal();
         String token = authService.generateToken(userDetails);
 
+        String username = userDetails.getUsername();
+        String email = userDetails.getUsername();
+        if (userDetails instanceof CustomUserDetails customUserDetails) {
+            email = customUserDetails.getEmail();
+            username = customUserDetails.getActualUsername() != null ? customUserDetails.getActualUsername() : customUserDetails.getUsername();
+        }
+
         AuthResponse response = AuthResponse.builder()
                 .token(token)
-                .username(userDetails.getUsername())
+                .username(username)
+                .email(email)
                 .role(userDetails.getAuthorities()
                         .stream()
                         .findFirst()

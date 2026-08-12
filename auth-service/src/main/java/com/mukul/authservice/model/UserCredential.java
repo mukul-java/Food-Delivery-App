@@ -17,9 +17,12 @@ public class UserCredential {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String fullName;
-    private String username; //email
+    private String username;
+    @Column(unique = true)
+    private String email;
     private String password;
     private Long phoneNumber;
     private Address address;
+    @Enumerated(EnumType.STRING)
     private UserRole userRole;
 }

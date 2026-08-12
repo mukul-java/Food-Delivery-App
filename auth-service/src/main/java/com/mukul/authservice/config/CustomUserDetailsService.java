@@ -18,8 +18,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<UserCredential> credential =  userRepository.findByUsername(username);
+        Optional<UserCredential> credential = userRepository.findByEmail(username)
+                .or(() -> userRepository.findByUsername(username));
         return credential.map(CustomUserDetails::new)
-                .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email/username: " + username));
     }
 }

@@ -33,33 +33,27 @@ public class AuthService {
     private AuthenticationManager authenticationManager;
 
     public UserDto saveUser(UserCredential credential) {
-        userRepository.findByUsername(credential.getUsername())
-                .ifPresent(user -> {
-                    throw new UserAlreadyExistsException(
-                            "User already exists with email: " + credential.getUsername()
-                    );
-                });
+        if (credential.getEmail() != null && userRepository.existsByEmail(credential.getEmail())) {
+            throw new UserAlreadyExistsException("User already exists with email: " + credential.getEmail());
+        }
+        if (credential.getUsername() != null && userRepository.existsByUsername(credential.getUsername())) {
+            throw new UserAlreadyExistsException("User already exists with username: " + credential.getUsername());
+        }
 
         // Encrypt the password before saving
-        credential.setPassword( passwordEncoder.encode(credential.getPassword()));
-//        credential.setPassword(credential.getPassword());
+        credential.setPassword(passwordEncoder.encode(credential.getPassword()));
         UserCredential savedUser = userRepository.save(credential);
 
         return mapUserCredentialToUserDto(savedUser);
     }
 
     public String generateToken(UserDetails userDetails) {
-//        UserCredential user = userRepository.findByUsername(username).orElseThrow();
         String role = userDetails.getAuthorities()
                 .iterator()
                 .next()
                 .getAuthority();
         return jwtService.generateToken(userDetails.getUsername(), role);
     }
-
-//    public void validateToken(String token) {
-//        jwtService.validateToken(token, username);
-//    }
 
     public UserDto getUser(long id) {
         UserCredential user = userRepository.findById(id).orElseThrow(()->
@@ -73,27 +67,28 @@ public class AuthService {
             throw new RuntimeException("User with given id is null");
         }
         UserCredential existingUser = userRepository.findById(user.getId()).orElseThrow(()->
-                new UserNotFoundException("User not found with id: " +user.getId())
+                new UserNotFoundException("User not found with id: " + user.getId())
         );
 
-        UserDto response = updateUser(user, existingUser);
-        return response;
+        return updateUser(existingUser, user);
     }
 
-    private UserDto updateUser(UserCredential user, UserCredential userNew) {
-        user.setFullName(userNew.getFullName());
-        user.setUsername(userNew.getUsername());
-        user.setPhoneNumber(userNew.getPhoneNumber());
-        user.setAddress(userNew.getAddress());
-        userRepository.save(user);
-        return mapUserCredentialToUserDto(user);
+    private UserDto updateUser(UserCredential existingUser, UserCredential userNew) {
+        existingUser.setFullName(userNew.getFullName());
+        existingUser.setUsername(userNew.getUsername());
+        existingUser.setEmail(userNew.getEmail());
+        existingUser.setPhoneNumber(userNew.getPhoneNumber());
+        existingUser.setAddress(userNew.getAddress());
+        userRepository.save(existingUser);
+        return mapUserCredentialToUserDto(existingUser);
     }
 
     private UserDto mapUserCredentialToUserDto(UserCredential user) {
         return UserDto.builder()
                 .id(user.getId())
                 .fullName(user.getFullName())
-                .email(user.getUsername())
+                .username(user.getUsername())
+                .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .address(user.getAddress())
                 .userRole(user.getUserRole())
@@ -111,8 +106,9 @@ public class AuthService {
                 .build()).toList();
     }
 
-    public String getUserRole(String username) {
-        Optional<UserCredential> userCredential = userRepository.findByUsername(username);
+    public String getUserRole(String identifier) {
+        Optional<UserCredential> userCredential = userRepository.findByEmail(identifier)
+                .or(() -> userRepository.findByUsername(identifier));
         return userCredential.map(credential -> credential.getUserRole().toString()).orElse(null);
     }
 }

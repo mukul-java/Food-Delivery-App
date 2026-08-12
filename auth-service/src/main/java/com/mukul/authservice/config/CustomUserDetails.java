@@ -33,6 +33,14 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
+        return userCredential.getEmail() != null ? userCredential.getEmail() : userCredential.getUsername();
+    }
+
+    public String getEmail() {
+        return userCredential.getEmail();
+    }
+
+    public String getActualUsername() {
         return userCredential.getUsername();
     }
 

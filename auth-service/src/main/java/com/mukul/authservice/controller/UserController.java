@@ -40,10 +40,12 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponse<UserDto>> updateUser(@RequestBody UserCredential user, @RequestHeader("loggedInUser") String username) {
         // Only user can update his/her details check if the User in request is same as the loggedInUser or not
-        if(!user.getUsername().equals(username)) {
+        boolean isCallerMatched = (user.getEmail() != null && user.getEmail().equals(username))
+                || (user.getUsername() != null && user.getUsername().equals(username));
+        if (!isCallerMatched) {
             return ResponseEntity.badRequest().body(ApiResponse.<UserDto>builder()
                     .success(false)
-                    .message("Username or username does not match")
+                    .message("Logged in user identity does not match request user")
                     .data(null)
                     .build());
         }
@@ -51,7 +53,7 @@ public class UserController {
         return ResponseEntity.ok(
                 ApiResponse.<UserDto>builder()
                         .success(true)
-                        .message("user registered successfully")
+                        .message("user updated successfully")
                         .data(response)
                         .build());
     }
