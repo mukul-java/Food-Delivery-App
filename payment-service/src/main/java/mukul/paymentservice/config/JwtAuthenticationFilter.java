@@ -15,6 +15,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtAuthenticationFilter
@@ -41,7 +43,15 @@ public class JwtAuthenticationFilter
                 String username = jwtUtil.extractUsername(token);
                 String role = jwtUtil.extractRole(token);
 
-                List<SimpleGrantedAuthority> authorities = List.of( new SimpleGrantedAuthority(role) );
+                List<SimpleGrantedAuthority> authorities = new java.util.ArrayList<>();
+                if (role != null) {
+                    authorities.add(new SimpleGrantedAuthority(role.startsWith("ROLE_") ? role : "ROLE_" + role));
+                    authorities.add(new SimpleGrantedAuthority(role.startsWith("ROLE_") ? role.substring(5) : role));
+                    java.util.Set<Permission> permissions = Permission.getPermissionsForRole(role);
+                    for (Permission perm : permissions) {
+                        authorities.add(new SimpleGrantedAuthority(perm.name()));
+                    }
+                }
 
                 Authentication authentication = new UsernamePasswordAuthenticationToken(
                                 username,

@@ -38,6 +38,64 @@ public class OrderServiceImpl {
     @Autowired
     private OrderMapper orderMapper;
 
+    @Autowired
+    private CartService cartService;
+
+    public OrderResponseDto checkoutCart(mukul.order.dto.CheckoutRequestDto request) {
+        mukul.order.dto.CartDto cart = cartService.getCart(request.getUserId());
+        
+        if (cart == null || cart.getItems().isEmpty()) {
+            throw new RuntimeException("Cart is empty for user: " + request.getUserId());
+        }
+
+        Order order = new Order();
+        order.setUserId(cart.getUserId());
+        order.setRestaurantId(cart.getRestaurantId());
+        order.setOrderTime(new Date());
+        order.setCreatedAt(new Date());
+        order.setOrderStatus(OrderStatus.PENDING);
+        order.setAddress(request.getAddress());
+        
+        List<OrderItem> orderItems = cart.getItems().stream().map(cartItem -> {
+            OrderItem item = new OrderItem();
+            item.setFoodItemId(cartItem.getFoodItemId());
+            item.setName(cartItem.getName());
+            item.setPrice(cartItem.getPrice());
+            item.setQuantity(cartItem.getQuantity());
+            return item;
+        }).toList();
+        
+        order.setOrderItems(orderItems);
+        order.setTotalAmount(cart.getTotalAmount());
+
+        Order createdOrder = orderRepository.save(order);
+
+        List<String> foodItemIds = createdOrder.getOrderItems()
+                .stream()
+                .map(OrderItem::getFoodItemId)
+                .toList();
+
+        List<Integer> orderQuantities = createdOrder.getOrderItems()
+                .stream()
+                .map(OrderItem::getQuantity)
+                .toList();
+
+        OrderCreatedEvent event = new OrderCreatedEvent(
+                foodItemIds,
+                orderQuantities,
+                createdOrder.getRestaurantId(),
+                createdOrder.getId(),
+                createdOrder.getTotalAmount(),
+                createdOrder.getUserId()
+        );
+
+        kafkaTemplate.send("order-created", event);
+
+        cartService.clearCart(request.getUserId());
+
+        return orderMapper.toResponseDto(createdOrder);
+    }
+
     public OrderResponseDto createOrder(OrderRequestDto request) {
 
         Order order = orderMapper.toEntity(request);

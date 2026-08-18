@@ -12,16 +12,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@PreAuthorize("hasAuthority('RESTAURANT_OWNER')")
 @RestController
 @RequestMapping("api/v1/restaurant")
 @RequiredArgsConstructor
 public class RestaurantController {
     private final RestaurantService restaurantService;
+
+    @PreAuthorize("hasAuthority('RESTAURANT_CREATE')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<ApiResponse<RestaurantResponseDto>> addRestaurant(@RequestBody RestaurantRequestDto request,
-        @RequestHeader("loggedInUser") String username) {
+        @RequestHeader(value = "loggedInUser", required = false) String username) {
 //        return restaurantService.addRestaurant(request, username);
         RestaurantResponseDto response = restaurantService.addRestaurant(request, username);
 
@@ -35,6 +36,7 @@ public class RestaurantController {
                 );
     }
 
+    @PreAuthorize("hasAuthority('RESTAURANT_UPDATE')")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponse<RestaurantResponseDto>>
@@ -52,6 +54,7 @@ public class RestaurantController {
         );
     }
 
+    @PreAuthorize("hasAuthority('RESTAURANT_READ')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponse<List<RestaurantResponseDto>>> getAllRestaurants() {
@@ -67,7 +70,7 @@ public class RestaurantController {
 
     }
 
-//    @PreAuthorize("hasAuthority('RESTAURANT_OWNER')")
+    @PreAuthorize("hasAuthority('RESTAURANT_READ')")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponse<RestaurantResponseDto>> getRestaurant(@PathVariable("id") String id) {

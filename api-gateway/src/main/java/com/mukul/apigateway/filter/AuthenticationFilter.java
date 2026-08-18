@@ -8,13 +8,7 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Slf4j
 @Component
@@ -51,27 +45,13 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     // validate token
                     jwtUtil.validateToken(authHeader);
 
-                    // extract username
+                    // extract username and role
                     String username = jwtUtil.extractUserName(authHeader);
-
-                    // extract role
                     String role = jwtUtil.extractRole(authHeader);
 
-                    // create authorities
-                    List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
-                    log.info("Authorities extracted: "+ authorities);
-                    // create authentication object
-                    Authentication authentication =
-                            new UsernamePasswordAuthenticationToken(
-                                    username,
-                                    null,
-                                    authorities
-                            );
+                    log.info("Token validated successfully for user: {} with role: {}", username, role);
 
-                    // store inside security context of the api-gateway service only
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                    // optionally forward headers downstream
+                    // forward headers downstream
                     request = exchange.getRequest()
                             .mutate()
                             .header("loggedInUser", username)

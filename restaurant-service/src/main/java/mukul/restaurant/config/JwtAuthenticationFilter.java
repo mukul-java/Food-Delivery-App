@@ -15,6 +15,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtAuthenticationFilter
@@ -32,7 +34,7 @@ public class JwtAuthenticationFilter
 
         String authHeader = request.getHeader("Authorization");
 
-        if(authHeader != null && authHeader.startsWith("Bearer ")) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
 
             String token = authHeader.substring(7);
 
@@ -41,23 +43,30 @@ public class JwtAuthenticationFilter
                 String username = jwtUtil.extractUsername(token);
                 String role = jwtUtil.extractRole(token);
 
-                List<SimpleGrantedAuthority>
-                        authorities = List.of( new SimpleGrantedAuthority(role) );
+                List<SimpleGrantedAuthority> authorities = new java.util.ArrayList<>();
+                if (role != null) {
+                    authorities.add(new SimpleGrantedAuthority(role.startsWith("ROLE_") ? role : "ROLE_" + role));
+                    authorities.add(new SimpleGrantedAuthority(role.startsWith("ROLE_") ? role.substring(5) : role));
+                    java.util.Set<Permission> permissions = Permission.getPermissionsForRole(role);
+                    for (Permission perm : permissions) {
+                        authorities.add(new SimpleGrantedAuthority(perm.name()));
+                    }
+                }
 
                 Authentication authentication = new UsernamePasswordAuthenticationToken(
-                                username,
-                                null,
-                                authorities);
+                        username,
+                        null,
+                        authorities);
 
                 SecurityContextHolder
                         .getContext()
                         .setAuthentication(authentication);
 
-            } catch(Exception e) {
+            } catch (Exception e) {
                 logger.error("Error while assigning security context: " + e.getMessage());
                 SecurityContextHolder.clearContext();
             }
         }
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 }

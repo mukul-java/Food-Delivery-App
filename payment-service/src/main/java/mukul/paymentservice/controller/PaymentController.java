@@ -5,15 +5,11 @@ import mukul.paymentservice.dto.ApiResponse;
 import mukul.paymentservice.dto.PaymentQueryDto;
 import mukul.paymentservice.dto.PaymentRequestDto;
 import mukul.paymentservice.dto.PaymentResponseDto;
-import mukul.paymentservice.enums.PaymentGateway;
-import mukul.paymentservice.enums.PaymentMethod;
-import mukul.paymentservice.enums.PaymentStatus;
 import mukul.paymentservice.service.PaymentService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/payments")
@@ -22,6 +18,7 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
+    @PreAuthorize("hasAuthority('PAYMENT_CREATE')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<PaymentResponseDto> createPayment(
@@ -34,6 +31,7 @@ public class PaymentController {
                 .build();
     }
 
+    @PreAuthorize("hasAuthority('PAYMENT_READ')")
     @GetMapping("/{paymentId}")
     public ApiResponse<PaymentResponseDto> getPayment(
             @PathVariable String paymentId) {
@@ -45,6 +43,7 @@ public class PaymentController {
                 .build();
     }
 
+    @PreAuthorize("hasAuthority('PAYMENT_READ')")
     @GetMapping
     public ApiResponse<Page<PaymentResponseDto>> getPayments(
             @ModelAttribute PaymentQueryDto request) {
@@ -56,6 +55,7 @@ public class PaymentController {
                 .build();
     }
 
+    @PreAuthorize("hasAuthority('PAYMENT_CREATE')")
     @PostMapping("/{paymentId}/retry")
     public ApiResponse<PaymentResponseDto> retryPayment(
             @PathVariable String paymentId) {
@@ -67,6 +67,7 @@ public class PaymentController {
                 .build();
     }
 
+    @PreAuthorize("hasAuthority('PAYMENT_UPDATE')")
     @PostMapping("/{paymentId}/cancel")
     public ApiResponse<PaymentResponseDto> cancelPayment(
             @PathVariable String paymentId) {

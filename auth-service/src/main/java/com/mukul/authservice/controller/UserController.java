@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/user")
@@ -21,10 +23,11 @@ public class UserController {
     @Autowired
     private AuthService authService;
 
+    @PreAuthorize("hasAuthority('USER_READ')")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponse<UserDto>> getUser(@PathVariable("id") long id,
-            @RequestHeader("loggedInUser") String username) {
+            @RequestHeader(value = "loggedInUser", required = false) String username) {
         log.info("Get user with username: " + username);
         UserDto response = authService.getUser(id);
         return ResponseEntity.ok(
@@ -36,13 +39,14 @@ public class UserController {
 
     }
 
+    @PreAuthorize("hasAuthority('USER_UPDATE')")
     @PutMapping()
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponse<UserDto>> updateUser(@RequestBody UserCredential user,
-            @RequestHeader("loggedInUser") String username) {
+            @RequestHeader(value = "loggedInUser", required = false) String username) {
         // Only user can update his/her details check if the User in request is same as
         // the loggedInUser or not
-        boolean isCallerMatched = (user.getEmail() != null && user.getEmail().equals(username))
+        boolean isCallerMatched = username == null || (user.getEmail() != null && user.getEmail().equals(username))
                 || (user.getUsername() != null && user.getUsername().equals(username));
         if (!isCallerMatched) {
             return ResponseEntity.badRequest().body(ApiResponse.<UserDto>builder()
@@ -60,6 +64,7 @@ public class UserController {
                         .build());
     }
 
+    @PreAuthorize("hasAuthority('USER_READ_DELIVERY')")
     @GetMapping("/delivery")
     public List<DeliveryAgent> getDeliveryAgents() {
         return authService.getDeliveryAgents();

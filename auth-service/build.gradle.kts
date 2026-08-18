@@ -33,5 +33,4 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
     implementation("org.springframework.kafka:spring-kafka:3.0.8")
-
 }

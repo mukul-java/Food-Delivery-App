@@ -17,15 +17,15 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/fooditem")
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority('RESTAURANT_OWNER')")
 public class FoodItemController {
     @Autowired
     private FoodItemServiceImpl foodItemService;
 
+    @PreAuthorize("hasAuthority('FOODITEM_CREATE')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<ApiResponse<FoodItemDto>> addFoodItem(@RequestBody FoodItemDto foodItemDto,
-                                                                @RequestHeader("loggedInUser") String username) {
+                                                                @RequestHeader(value = "loggedInUser", required = false) String username) {
         FoodItemDto response = foodItemService.addFoodItem(foodItemDto,username);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -38,6 +38,7 @@ public class FoodItemController {
                 );
     }
 
+    @PreAuthorize("hasAuthority('FOODITEM_READ')")
     @GetMapping("/{restaurantId}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponse<List<FoodItemDto>>> getFoodItems(@PathVariable("restaurantId") String restaurantId) {
@@ -53,6 +54,7 @@ public class FoodItemController {
     }
 
     // Get all food items irrespective of restaurant.
+    @PreAuthorize("hasAuthority('FOODITEM_READ')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponse<Page<FoodItemDto>>> getAllFoodItems(@RequestParam int page, int size) {
@@ -65,10 +67,12 @@ public class FoodItemController {
                         .build()
         );
     }
+
+    @PreAuthorize("hasAuthority('FOODITEM_UPDATE')")
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ApiResponse<FoodItemDto>> updateFoodItem(@RequestBody FoodItemDto foodItemDto,
-                                 @RequestHeader("loggedInUser") String username) {
+                                 @RequestHeader(value = "loggedInUser", required = false) String username) {
         FoodItemDto response = foodItemService.updateFoodItem(foodItemDto, username);
 
         return ResponseEntity.ok(
@@ -80,6 +84,7 @@ public class FoodItemController {
         );
     }
 
+    @PreAuthorize("hasAuthority('FOODITEM_UPDATE_QUANTITY')")
     @PutMapping("/quantity")
     @ResponseStatus(HttpStatus.OK)
     public void updateFoodItemQuantity(@RequestParam List<String> foodItemIds, @RequestParam List<Integer> orderQuantities) {

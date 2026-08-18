@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -16,14 +18,19 @@ public class CustomUserDetails implements UserDetails {
         this.userCredential = userCredential;
     }
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(
-                new SimpleGrantedAuthority(
-                        userCredential.getUserRole().name()
-                )
-        );
+        String roleName = userCredential.getUserRole() != null ? userCredential.getUserRole().name() : "";
+        Set<Permission> permissions = Permission.getPermissionsForRole(roleName);
+        List<GrantedAuthority> authorities = new java.util.ArrayList<>();
+        if (!roleName.isBlank()) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName));
+            authorities.add(new SimpleGrantedAuthority(roleName));
+        }
+        for (Permission perm : permissions) {
+            authorities.add(new SimpleGrantedAuthority(perm.name()));
+        }
+        return authorities;
     }
 
     @Override
