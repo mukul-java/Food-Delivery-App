@@ -30,6 +30,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
+    // eureka discovery
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+
     // Kafka
     implementation("org.springframework.kafka:spring-kafka:3.0.8")
 

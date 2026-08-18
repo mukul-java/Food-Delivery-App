@@ -1,0 +1,71 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: mukul
+
+      changes:
+        - createTable:
+            tableName: payments_history
+
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_payments_history
+                    nullable: false
+
+              - column:
+                  name: payment_id
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: old_status
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: new_status
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: reason
+                  type: VARCHAR(500)
+
+              - column:
+                  name: created_at
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_by
+                  type: VARCHAR(100)
+
+        - createIndex:
+            tableName: payments_history
+            indexName: idx_payments_history_payment_id
+            columns:
+              - column:
+                  name: payment_id
+
+        - createIndex:
+            tableName: payments_history
+            indexName: idx_payments_history_created_at
+            columns:
+              - column:
+                  name: created_at
+
+        - addForeignKeyConstraint:
+            baseTableName: payments_history
+            baseColumnNames: payment_id
+            referencedTableName: payments
+            referencedColumnNames: payment_id
+            constraintName: fk_payments_history_payment

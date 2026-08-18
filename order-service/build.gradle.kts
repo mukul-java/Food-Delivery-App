@@ -23,8 +23,8 @@ dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
-// disabled eureka discovery
-//    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+// eureka discovery
+   implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 

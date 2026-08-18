@@ -1,43 +1,31 @@
 package mukul.paymentservice.service;
 
+import mukul.paymentservice.dto.PaymentQueryDto;
 import mukul.paymentservice.dto.PaymentRequestDto;
 import mukul.paymentservice.dto.PaymentResponseDto;
+import mukul.paymentservice.model.Payment;
+import org.springframework.data.domain.Page;
 
 public interface PaymentService {
 
-    /**
-     * Creates a new payment.
-     */
+    /** Creates a new payment. */
     PaymentResponseDto createPayment(PaymentRequestDto request);
 
-    /**
-     * Returns payment details.
-     */
+    /** Returns a payment by payment id. */
     PaymentResponseDto getPayment(String paymentId);
 
-    /**
-     * CREATED -> PENDING
-     */
-    PaymentResponseDto markPending(String paymentId);
+    /** Returns payments matching the given filters. */
+    Page<PaymentResponseDto> getPayments(PaymentQueryDto request);
 
-    /**
-     * PENDING -> SUCCESS
-     */
-    PaymentResponseDto markSuccess(String paymentId);
+    /** Retries a failed or expired payment. */
+    PaymentResponseDto retryPayment(String paymentId);
 
-    /**
-     * PENDING -> FAILED
-     */
-    PaymentResponseDto markFailed(String paymentId);
-
-    /**
-     * PENDING -> CANCELLED
-     */
+    /** Cancels a pending payment. */
     PaymentResponseDto cancelPayment(String paymentId);
 
-    /**
-     * PENDING -> EXPIRED
-     */
-    PaymentResponseDto expirePayment(String paymentId);
+    /** Processes gateway webhook events. */
+    void handleWebhook(String payload);
 
+    /** Publishes a payment status change event. */
+//    void publishPaymentStatusChangedEvent(Payment payment);
 }

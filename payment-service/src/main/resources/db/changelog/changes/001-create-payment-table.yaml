@@ -1,0 +1,154 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: mukul
+
+      changes:
+        - createTable:
+            tableName: payments
+
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_payments
+                    nullable: false
+
+              - column:
+                  name: payment_id
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uk_payment_payment_id
+
+              - column:
+                  name: order_id
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: user_id
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: amount
+                  type: DECIMAL(12,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: currency
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: payment_method
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: gateway
+                  type: VARCHAR(30)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: gateway_payment_id
+                  type: VARCHAR(100)
+                  constraints:
+                    unique: true
+                    uniqueConstraintName: uk_gateway_payment_id
+
+              - column:
+                  name: gateway_transaction_id
+                  type: VARCHAR(100)
+
+              - column:
+                  name: failure_reason
+                  type: VARCHAR(500)
+
+              - column:
+                  name: expires_at
+                  type: DATETIME
+
+              - column:
+                  name: created_at
+                  type: DATETIME
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: updated_at
+                  type: DATETIME
+
+              - column:
+                  name: created_by
+                  type: VARCHAR(100)
+
+              - column:
+                  name: updated_by
+                  type: VARCHAR(100)
+
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+        - createIndex:
+            tableName: payments
+            indexName: idx_payment_payment_id
+            columns:
+              - column:
+                  name: payment_id
+
+        - createIndex:
+            tableName: payments
+            indexName: idx_payment_order_id
+            columns:
+              - column:
+                  name: order_id
+
+        - createIndex:
+            tableName: payments
+            indexName: idx_payment_user_id
+            columns:
+              - column:
+                  name: user_id
+
+        - createIndex:
+            tableName: payments
+            indexName: idx_payment_status
+            columns:
+              - column:
+                  name: status
+
+        - createIndex:
+            tableName: payments
+            indexName: idx_payment_gateway_payment_id
+            columns:
+              - column:
+                  name: gateway_payment_id
+
+        - createIndex:
+            tableName: payments
+            indexName: idx_payment_gateway_transaction_id
+            columns:
+              - column:
+                  name: gateway_transaction_id

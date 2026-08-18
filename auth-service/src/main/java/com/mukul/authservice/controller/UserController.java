@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import static java.rmi.server.LogStream.log;
 
 @Slf4j
 @RestController
@@ -24,8 +23,9 @@ public class UserController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ApiResponse<UserDto>> getUser(@PathVariable("id") long id, @RequestHeader("loggedInUser") String username) {
-        log("Get user with username: "+ username);
+    public ResponseEntity<ApiResponse<UserDto>> getUser(@PathVariable("id") long id,
+            @RequestHeader("loggedInUser") String username) {
+        log.info("Get user with username: " + username);
         UserDto response = authService.getUser(id);
         return ResponseEntity.ok(
                 ApiResponse.<UserDto>builder()
@@ -38,8 +38,10 @@ public class UserController {
 
     @PutMapping()
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ApiResponse<UserDto>> updateUser(@RequestBody UserCredential user, @RequestHeader("loggedInUser") String username) {
-        // Only user can update his/her details check if the User in request is same as the loggedInUser or not
+    public ResponseEntity<ApiResponse<UserDto>> updateUser(@RequestBody UserCredential user,
+            @RequestHeader("loggedInUser") String username) {
+        // Only user can update his/her details check if the User in request is same as
+        // the loggedInUser or not
         boolean isCallerMatched = (user.getEmail() != null && user.getEmail().equals(username))
                 || (user.getUsername() != null && user.getUsername().equals(username));
         if (!isCallerMatched) {

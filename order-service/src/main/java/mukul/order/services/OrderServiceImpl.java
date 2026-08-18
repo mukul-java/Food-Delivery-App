@@ -153,4 +153,16 @@ public class OrderServiceImpl {
                         .sum()
         );
     }
-}
+
+    /**
+     * Synchronously fetches payment details from payment-service via Eureka and WebClient.
+     */
+    public Object getPaymentStatusFromPaymentService(String paymentId) {
+        return webClientBuilder.build()
+                .get()
+                .uri("http://payment-service/api/v1/payments/" + paymentId)
+                .retrieve()
+                .bodyToMono(Object.class)
+                .block();
+    }
+}
