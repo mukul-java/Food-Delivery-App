@@ -20,6 +20,6 @@ public class RestaurantResponseDto {
     private Address address;
     private List<Long> contactInfo;
     private Double rating;
-    private String ownerUsername;
+    private String ownerId;
     private List<FoodItemDto> foodItems;
 }

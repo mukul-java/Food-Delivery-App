@@ -16,4 +16,6 @@ public interface FoodItemService {
     FoodItemDto updateFoodItem(FoodItemDto foodItemDto, String username);
 
     void updateFoodItemQuantity(List<String> foodItemIds, List<Integer> orderQuantities);
+
+    void deleteFoodItem(String foodItemId, String username);
 }

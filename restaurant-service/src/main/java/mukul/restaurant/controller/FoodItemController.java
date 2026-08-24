@@ -24,9 +24,12 @@ public class FoodItemController {
     @PreAuthorize("hasAuthority('FOODITEM_CREATE')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ApiResponse<FoodItemDto>> addFoodItem(@RequestBody FoodItemDto foodItemDto,
-                                                                @RequestHeader(value = "loggedInUser", required = false) String username) {
-        FoodItemDto response = foodItemService.addFoodItem(foodItemDto,username);
+    public ResponseEntity<ApiResponse<FoodItemDto>> addFoodItem(
+            @RequestBody FoodItemDto foodItemDto,
+            @RequestHeader(value = "loggedInUserId", required = false) String ownerId,
+            @RequestHeader(value = "loggedInUser", required = false) String username) {
+        String effectiveOwnerId = (ownerId != null && !ownerId.isBlank()) ? ownerId : username;
+        FoodItemDto response = foodItemService.addFoodItem(foodItemDto, effectiveOwnerId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
@@ -71,9 +74,12 @@ public class FoodItemController {
     @PreAuthorize("hasAuthority('FOODITEM_UPDATE')")
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ApiResponse<FoodItemDto>> updateFoodItem(@RequestBody FoodItemDto foodItemDto,
-                                 @RequestHeader(value = "loggedInUser", required = false) String username) {
-        FoodItemDto response = foodItemService.updateFoodItem(foodItemDto, username);
+    public ResponseEntity<ApiResponse<FoodItemDto>> updateFoodItem(
+            @RequestBody FoodItemDto foodItemDto,
+            @RequestHeader(value = "loggedInUserId", required = false) String ownerId,
+            @RequestHeader(value = "loggedInUser", required = false) String username) {
+        String effectiveOwnerId = (ownerId != null && !ownerId.isBlank()) ? ownerId : username;
+        FoodItemDto response = foodItemService.updateFoodItem(foodItemDto, effectiveOwnerId);
 
         return ResponseEntity.ok(
                 ApiResponse.<FoodItemDto>builder()
@@ -84,11 +90,29 @@ public class FoodItemController {
         );
     }
 
-    @PreAuthorize("hasAuthority('FOODITEM_UPDATE_QUANTITY')")
+    @PreAuthorize("hasAuthority('FOODITEM_UPDATE')")
     @PutMapping("/quantity")
     @ResponseStatus(HttpStatus.OK)
     public void updateFoodItemQuantity(@RequestParam List<String> foodItemIds, @RequestParam List<Integer> orderQuantities) {
         foodItemService.updateFoodItemQuantity(foodItemIds, orderQuantities);
+    }
+
+    @PreAuthorize("hasAuthority('FOODITEM_DELETE')")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ApiResponse<Void>> deleteFoodItem(
+            @PathVariable("id") String id,
+            @RequestHeader(value = "loggedInUserId", required = false) String ownerId,
+            @RequestHeader(value = "loggedInUser", required = false) String username) {
+        String effectiveOwnerId = (ownerId != null && !ownerId.isBlank()) ? ownerId : username;
+        foodItemService.deleteFoodItem(id, effectiveOwnerId);
+
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .success(true)
+                        .message("Food item deleted successfully")
+                        .build()
+        );
     }
 
     @GetMapping("/debug")

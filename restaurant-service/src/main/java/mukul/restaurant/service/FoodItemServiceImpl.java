@@ -15,6 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import java.util.Date;
 import java.util.List;
 
@@ -31,13 +34,14 @@ public class FoodItemServiceImpl implements FoodItemService {
 
     @Override
     public FoodItemDto addFoodItem(FoodItemDto foodItemDto, String username) {
+        if (foodItemDto == null || foodItemDto.getRestaurantId() == null || foodItemDto.getRestaurantId().isBlank()) {
+            throw new RuntimeException("Restaurant ID must not be null or empty when creating a food item");
+        }
 
         Restaurant restaurant = restaurantRepository.findById(foodItemDto.getRestaurantId())
-                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+                .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + foodItemDto.getRestaurantId()));
 
-        if (!restaurant.getOwner().getUsername().equals(username)) {
-            throw new RuntimeException("Access Denied. Not restaurant owner");
-        }
+        validateRestaurantOwner(restaurant, username);
 
         FoodItem foodItem = convertToFoodItem(foodItemDto);
 
@@ -72,26 +76,88 @@ public class FoodItemServiceImpl implements FoodItemService {
 
     @Override
     public FoodItemDto updateFoodItem(FoodItemDto foodItemDto, String username) {
-
-        Restaurant restaurant = restaurantRepository.findById(foodItemDto.getRestaurantId())
-                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
-
-        if (!restaurant.getOwner().getUsername().equals(username)) {
-            throw new RuntimeException("Access Denied. Not restaurant owner");
+        if (foodItemDto == null || foodItemDto.getId() == null || foodItemDto.getId().isBlank()) {
+            throw new RuntimeException("Food Item ID must not be null or empty");
         }
 
         FoodItem foodItem = foodItemRepository.findById(foodItemDto.getId())
-                .orElseThrow(() -> new RuntimeException("Food Item not found"));
+                .orElseThrow(() -> new RuntimeException("Food Item not found with ID: " + foodItemDto.getId()));
 
-        foodItem.setName(foodItemDto.getName());
-        foodItem.setDescription(foodItemDto.getDescription());
-        foodItem.setPrice(foodItemDto.getPrice());
-        foodItem.setQuantity(foodItemDto.getQuantity());
+        Restaurant restaurant = null;
+        if (foodItemDto.getRestaurantId() != null && !foodItemDto.getRestaurantId().isBlank()) {
+            restaurant = restaurantRepository.findById(foodItemDto.getRestaurantId())
+                    .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + foodItemDto.getRestaurantId()));
+        } else {
+            restaurant = foodItem.getRestaurant();
+        }
+
+        if (restaurant == null) {
+            throw new RuntimeException("Associated Restaurant not found for Food Item");
+        }
+
+        validateRestaurantOwner(restaurant, username);
+
+        if (foodItemDto.getName() != null) foodItem.setName(foodItemDto.getName());
+        if (foodItemDto.getDescription() != null) foodItem.setDescription(foodItemDto.getDescription());
+        if (foodItemDto.getPrice() != null) foodItem.setPrice(foodItemDto.getPrice());
+        if (foodItemDto.getQuantity() != null) foodItem.setQuantity(foodItemDto.getQuantity());
         foodItem.setUpdatedAt(new Date());
 
         FoodItem updatedFoodItem = foodItemRepository.save(foodItem);
 
         return convertToFoodItemDto(updatedFoodItem);
+    }
+
+    @Override
+    public void deleteFoodItem(String foodItemId, String username) {
+        FoodItem foodItem = foodItemRepository.findById(foodItemId)
+                .orElseThrow(() -> new RuntimeException("Food Item not found"));
+
+        Restaurant restaurant = foodItem.getRestaurant();
+        if (restaurant != null) {
+            validateRestaurantOwner(restaurant, username);
+        }
+
+        foodItemRepository.delete(foodItem);
+    }
+
+    private void validateRestaurantOwner(Restaurant restaurant, String username) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // 1. Bypass check if logged in user is ADMIN
+        if (auth != null && auth.getAuthorities() != null) {
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equalsIgnoreCase("ROLE_ADMIN") 
+                            || a.getAuthority().equalsIgnoreCase("ADMIN"));
+            if (isAdmin) {
+                return;
+            }
+        }
+
+        // 2. Fallback to SecurityContext username if header username is missing
+        if ((username == null || username.isBlank()) && auth != null && auth.getName() != null && !auth.getName().equals("anonymousUser")) {
+            username = auth.getName();
+        }
+
+        // 3. If ownerId is not set on restaurant, skip validation
+        if (restaurant.getOwnerId() == null || restaurant.getOwnerId().isBlank()) {
+            return;
+        }
+
+        // 4. Validate matching ownerId, username, or email prefix
+        if (username != null && !username.isBlank()) {
+            String targetOwnerId = restaurant.getOwnerId().trim().toLowerCase();
+            String currentUser = username.trim().toLowerCase();
+
+            boolean isMatch = targetOwnerId.equals(currentUser)
+                    || (currentUser.contains("@") && currentUser.split("@")[0].equals(targetOwnerId))
+                    || (targetOwnerId.contains("@") && targetOwnerId.split("@")[0].equals(currentUser));
+
+            if (!isMatch) {
+                log.warn("Access Denied: Current user/id '{}' does not match restaurant ownerId '{}'", username, restaurant.getOwnerId());
+                throw new RuntimeException("Access Denied. Not restaurant owner");
+            }
+        }
     }
 
     @Override

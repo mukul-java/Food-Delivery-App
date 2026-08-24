@@ -51,6 +51,14 @@ public class CustomUserDetails implements UserDetails {
         return userCredential.getUsername();
     }
 
+    public String getUserId() {
+        return userCredential != null && userCredential.getId() != null ? String.valueOf(userCredential.getId()) : "";
+    }
+
+    public UserCredential getUserCredential() {
+        return userCredential;
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

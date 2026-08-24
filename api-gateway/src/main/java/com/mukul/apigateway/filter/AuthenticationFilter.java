@@ -29,11 +29,13 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     public GatewayFilter apply(Config config) {
 
         return ((exchange, chain) -> {
-            ServerHttpRequest request = null;
+            ServerHttpRequest request = exchange.getRequest();
             if (validator.isSecured.test(exchange.getRequest())) {
                 //header contains token or not
                 if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                    throw new RuntimeException("missing authorization header");
+                    log.error("Missing authorization header for request path: {}", exchange.getRequest().getURI().getPath());
+                    exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+                    return exchange.getResponse().setComplete();
                 }
 
                 String authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
@@ -45,22 +47,25 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     // validate token
                     jwtUtil.validateToken(authHeader);
 
-                    // extract username and role
+                    // extract username, role, and userId
                     String username = jwtUtil.extractUserName(authHeader);
                     String role = jwtUtil.extractRole(authHeader);
+                    String userId = jwtUtil.extractUserId(authHeader);
 
-                    log.info("Token validated successfully for user: {} with role: {}", username, role);
+                    log.info("Token validated successfully for user: {} (id: {}) with role: {}", username, userId, role);
 
                     // forward headers downstream
                     request = exchange.getRequest()
                             .mutate()
                             .header("loggedInUser", username)
                             .header("loggedInRole", role)
+                            .header("loggedInUserId", userId != null ? userId : "")
                             .build();
 
-                }catch (Exception e) {
-                    log.error("Authentication failed", e);
-                    throw new RuntimeException("unauthorized access to application");
+                } catch (Exception e) {
+                    log.error("Authentication failed for path {}: {}", exchange.getRequest().getURI().getPath(), e.getMessage());
+                    exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+                    return exchange.getResponse().setComplete();
                 }
             }
             return chain.filter(exchange.mutate().request(request).build());

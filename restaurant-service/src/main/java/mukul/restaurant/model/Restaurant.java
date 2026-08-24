@@ -54,8 +54,8 @@ public class Restaurant {
     @Column(name = "rating")
     private Double rating;
 
-    @Embedded
-    private OwnerInfo owner;
+    @Column(name = "owner_id", nullable = false)
+    private String ownerId;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false)

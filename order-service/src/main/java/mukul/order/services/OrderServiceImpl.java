@@ -176,6 +176,16 @@ public class OrderServiceImpl {
         return orderRepository.findAll(pageable).map(orderMapper::toResponseDto);
     }
 
+    public Page<OrderResponseDto> getOrdersByUserId(String userId, OrderStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        if (status != null) {
+            return orderRepository.findByUserIdAndOrderStatusOrderByOrderTimeDesc(userId, status, pageable)
+                    .map(orderMapper::toResponseDto);
+        }
+        return orderRepository.findByUserIdOrderByOrderTimeDesc(userId, pageable)
+                .map(orderMapper::toResponseDto);
+    }
+
     public OrderResponseDto getOrderById(String orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));

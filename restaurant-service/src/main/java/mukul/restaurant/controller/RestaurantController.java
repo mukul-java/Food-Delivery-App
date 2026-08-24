@@ -21,10 +21,12 @@ public class RestaurantController {
     @PreAuthorize("hasAuthority('RESTAURANT_CREATE')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ApiResponse<RestaurantResponseDto>> addRestaurant(@RequestBody RestaurantRequestDto request,
-        @RequestHeader(value = "loggedInUser", required = false) String username) {
-//        return restaurantService.addRestaurant(request, username);
-        RestaurantResponseDto response = restaurantService.addRestaurant(request, username);
+    public ResponseEntity<ApiResponse<RestaurantResponseDto>> addRestaurant(
+            @RequestBody RestaurantRequestDto request,
+            @RequestHeader(value = "loggedInUserId", required = false) String ownerId,
+            @RequestHeader(value = "loggedInUser", required = false) String username) {
+        String effectiveOwnerId = (ownerId != null && !ownerId.isBlank()) ? ownerId : username;
+        RestaurantResponseDto response = restaurantService.addRestaurant(request, effectiveOwnerId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
@@ -39,16 +41,37 @@ public class RestaurantController {
     @PreAuthorize("hasAuthority('RESTAURANT_UPDATE')")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ApiResponse<RestaurantResponseDto>>
-    updateRestaurant(
-            @PathVariable String id, @RequestBody RestaurantRequestDto request) {
+    public ResponseEntity<ApiResponse<RestaurantResponseDto>> updateRestaurant(
+            @PathVariable String id,
+            @RequestBody RestaurantRequestDto request,
+            @RequestHeader(value = "loggedInUserId", required = false) String ownerId,
+            @RequestHeader(value = "loggedInUser", required = false) String username) {
 
-        RestaurantResponseDto response = restaurantService.updateRestaurant(id, request);
+        String effectiveOwnerId = (ownerId != null && !ownerId.isBlank()) ? ownerId : username;
+        RestaurantResponseDto response = restaurantService.updateRestaurant(id, request, effectiveOwnerId);
 
         return ResponseEntity.ok(
                 ApiResponse.<RestaurantResponseDto>builder()
                         .success(true)
                         .message("Restaurant updated successfully")
+                        .data(response)
+                        .build()
+        );
+    }
+
+    @PreAuthorize("hasAuthority('RESTAURANT_READ')")
+    @GetMapping("/owner")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ApiResponse<List<RestaurantResponseDto>>> getOwnerRestaurants(
+            @RequestHeader(value = "loggedInUserId", required = false) String ownerId,
+            @RequestHeader(value = "loggedInUser", required = false) String username) {
+        String effectiveOwnerId = (ownerId != null && !ownerId.isBlank()) ? ownerId : username;
+        List<RestaurantResponseDto> response = restaurantService.getRestaurantsByOwnerId(effectiveOwnerId);
+
+        return ResponseEntity.ok(
+                ApiResponse.<List<RestaurantResponseDto>>builder()
+                        .success(true)
+                        .message("Owner restaurants fetched successfully")
                         .data(response)
                         .build()
         );
@@ -63,7 +86,7 @@ public class RestaurantController {
          return ResponseEntity.ok(
                 ApiResponse.<List<RestaurantResponseDto>>builder()
                         .success(true)
-                        .message("Login successful")
+                        .message("Restaurants fetched successfully")
                         .data(response)
                         .build()
          );

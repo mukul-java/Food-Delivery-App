@@ -47,6 +47,7 @@ flowchart TD
 | `FOODITEM_CREATE` | Add new food item to menu | ❌ | ✅ | ❌ | ✅ | `restaurant-service` |
 | `FOODITEM_UPDATE` | Update food item details | ❌ | ✅ | ❌ | ✅ | `restaurant-service` |
 | `FOODITEM_UPDATE_QUANTITY` | Update stock quantity | ❌ | ✅ | ❌ | ✅ | `restaurant-service` |
+| `FOODITEM_DELETE` | Delete food item from menu | ❌ | ✅ | ❌ | ✅ | `restaurant-service` |
 | `CART_READ` | View active Redis cart | ✅ | ❌ | ❌ | ✅ | `order-service` |
 | `CART_WRITE` | Add/Remove/Clear items in cart | ✅ | ❌ | ❌ | ✅ | `order-service` |
 | `ORDER_CREATE` | Place order / checkout cart | ✅ | ❌ | ❌ | ✅ | `order-service` |
@@ -260,13 +261,22 @@ Base Gateway Path: `/api/v1/cart` & `/api/v1/order`
 - **Permission Required**: `@PreAuthorize("hasAuthority('ORDER_CREATE')")`
 - **Description**: Direct order placement.
 
-#### `GET /api/v1/order/{orderId}`
+#### `GET /api/v1/order/user/{userId}`
 - **Permission Required**: `@PreAuthorize("hasAuthority('ORDER_READ')")`
-- **Description**: Fetches order by order ID.
+- **Description**: Fetches paginated orders for a specific customer (`userId`) ordered by `orderTime` descending.
+- **Query Params**:
+  - `status` (*optional* `OrderStatus`: `PENDING`, `ACCEPTED`, `CANCELLED`, `COMPLETED`, `DELIVERED`)
+  - `page` (*default* `0`)
+  - `pageSize` (*default* `10`)
 
 #### `GET /api/v1/order`
 - **Permission Required**: `@PreAuthorize("hasAuthority('ORDER_READ')")`
-- **Description**: Paginated list of orders (`?page=0&pageSize=10`).
+- **Description**: Paginated list of orders.
+- **Query Params**:
+  - `userId` (*optional* string filter)
+  - `status` (*optional* `OrderStatus` filter)
+  - `page` (*default* `0`)
+  - `pageSize` (*default* `10`)
 
 #### `PUT /api/v1/order/status`
 - **Permission Required**: `@PreAuthorize("hasAuthority('ORDER_UPDATE_STATUS')")`

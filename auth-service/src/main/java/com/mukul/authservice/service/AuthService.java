@@ -52,7 +52,11 @@ public class AuthService {
                 .iterator()
                 .next()
                 .getAuthority();
-        return jwtService.generateToken(userDetails.getUsername(), role);
+        String userId = "";
+        if (userDetails instanceof com.mukul.authservice.config.CustomUserDetails customUserDetails) {
+            userId = customUserDetails.getUserId();
+        }
+        return jwtService.generateToken(userDetails.getUsername(), role, userId);
     }
 
     public UserDto getUser(long id) {

@@ -50,13 +50,16 @@ public class AuthController {
 
         String username = userDetails.getUsername();
         String email = userDetails.getUsername();
+        String userId = "";
         if (userDetails instanceof CustomUserDetails customUserDetails) {
             email = customUserDetails.getEmail();
             username = customUserDetails.getActualUsername() != null ? customUserDetails.getActualUsername() : customUserDetails.getUsername();
+            userId = customUserDetails.getUserId();
         }
 
         AuthResponse response = AuthResponse.builder()
                 .token(token)
+                .userId(userId)
                 .username(username)
                 .email(email)
                 .role(userDetails.getAuthorities()

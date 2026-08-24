@@ -9,15 +9,29 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class RestaurantExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGeneralException(
-            Exception ex
-    ) {
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiResponse<Object>> handleRuntimeException(RuntimeException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        if (ex.getMessage() != null && ex.getMessage().contains("Access Denied")) {
+            status = HttpStatus.FORBIDDEN;
+        } else if (ex.getMessage() != null && ex.getMessage().contains("not found")) {
+            status = HttpStatus.NOT_FOUND;
+        }
 
-        return new ResponseEntity<>(
-                ex.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
+        return ResponseEntity.status(status)
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .message(ex.getMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Object>> handleGeneralException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .message(ex.getMessage())
+                        .build());
     }
     @ExceptionHandler(RestaurantNotFound.class)
     public ResponseEntity<ApiResponse<Object>> handleUserNotFound(

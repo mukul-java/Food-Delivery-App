@@ -9,7 +9,8 @@ public enum Permission {
     FOODITEM_READ,
     FOODITEM_CREATE,
     FOODITEM_UPDATE,
-    FOODITEM_UPDATE_QUANTITY;
+    FOODITEM_UPDATE_QUANTITY,
+    FOODITEM_DELETE;
 
     private static final Map<String, Set<Permission>> ROLE_PERMISSIONS = new HashMap<>();
 
