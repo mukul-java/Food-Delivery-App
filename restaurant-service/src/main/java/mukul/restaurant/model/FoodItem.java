@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -45,11 +46,10 @@ public class FoodItem {
     )
     private Restaurant restaurant;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at", nullable = false)
-    private Date createdAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 }

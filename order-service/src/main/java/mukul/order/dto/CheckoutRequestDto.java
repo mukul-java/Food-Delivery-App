@@ -11,6 +11,6 @@ import mukul.order.model.Address;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CheckoutRequestDto {
-    private String userId;
+    private Long userId;
     private Address address;
 }

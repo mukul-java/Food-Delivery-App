@@ -14,7 +14,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @Query("SELECT SUM(o.totalAmount) FROM Order o")
     BigDecimal sumTotalAmount();
 
-    Page<Order> findByUserIdOrderByOrderTimeDesc(String userId, Pageable pageable);
+    Page<Order> findByUserIdOrderByOrderTimeDesc(Long userId, Pageable pageable);
 
-    Page<Order> findByUserIdAndOrderStatusOrderByOrderTimeDesc(String userId, OrderStatus orderStatus, Pageable pageable);
+    Page<Order> findByUserIdAndOrderStatusOrderByOrderTimeDesc(Long userId, OrderStatus orderStatus, Pageable pageable);
 }

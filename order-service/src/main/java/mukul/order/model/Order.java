@@ -58,7 +58,7 @@ public class Order {
     private String paymentId;
 
     @Column(name = "user_id", nullable = false)
-    private String userId;
+    private Long userId;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at", nullable = false)

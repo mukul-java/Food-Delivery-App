@@ -27,7 +27,7 @@ public class CartServiceImpl implements CartService {
     private static final long CART_TTL_HOURS = 24;
 
     @Override
-    public CartDto getCart(String userId) {
+    public CartDto getCart(Long userId) {
         String key = CART_KEY_PREFIX + userId;
         String cartJson = redisTemplate.opsForValue().get(key);
         
@@ -87,7 +87,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartDto removeFromCart(String userId, String foodItemId) {
+    public CartDto removeFromCart(Long userId, String foodItemId) {
         CartDto cart = getCart(userId);
         
         cart.getItems().removeIf(item -> item.getFoodItemId().equals(foodItemId));
@@ -105,7 +105,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void clearCart(String userId) {
+    public void clearCart(Long userId) {
         String key = CART_KEY_PREFIX + userId;
         redisTemplate.delete(key);
     }

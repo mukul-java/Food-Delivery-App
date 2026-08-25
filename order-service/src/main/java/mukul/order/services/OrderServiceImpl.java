@@ -1,7 +1,10 @@
 package mukul.order.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mukul.contracts.events.OrderCreatedEvent;
+import mukul.order.dto.CartDto;
+import mukul.order.dto.CheckoutRequestDto;
 import mukul.order.dto.OrderRequestDto;
 import mukul.order.dto.OrderResponseDto;
 import mukul.order.model.Order;
@@ -21,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -41,8 +45,8 @@ public class OrderServiceImpl {
     @Autowired
     private CartService cartService;
 
-    public OrderResponseDto checkoutCart(mukul.order.dto.CheckoutRequestDto request) {
-        mukul.order.dto.CartDto cart = cartService.getCart(request.getUserId());
+    public OrderResponseDto checkoutCart(CheckoutRequestDto request) {
+        CartDto cart = cartService.getCart(request.getUserId());
         
         if (cart == null || cart.getItems().isEmpty()) {
             throw new RuntimeException("Cart is empty for user: " + request.getUserId());
@@ -86,7 +90,7 @@ public class OrderServiceImpl {
                 createdOrder.getRestaurantId(),
                 createdOrder.getId(),
                 createdOrder.getTotalAmount(),
-                createdOrder.getUserId()
+                createdOrder.getUserId() != null ? String.valueOf(createdOrder.getUserId()) : null
         );
 
         kafkaTemplate.send("order-created", event);
@@ -122,7 +126,7 @@ public class OrderServiceImpl {
                 createdOrder.getRestaurantId(),
                 createdOrder.getId(),
                 createdOrder.getTotalAmount(),
-                createdOrder.getUserId()
+                createdOrder.getUserId() != null ? String.valueOf(createdOrder.getUserId()) : null
         );
 
         kafkaTemplate.send("order-created", event);
@@ -176,7 +180,7 @@ public class OrderServiceImpl {
         return orderRepository.findAll(pageable).map(orderMapper::toResponseDto);
     }
 
-    public Page<OrderResponseDto> getOrdersByUserId(String userId, OrderStatus status, int page, int size) {
+    public Page<OrderResponseDto> getOrdersByUserId(Long userId, OrderStatus status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         if (status != null) {
             return orderRepository.findByUserIdAndOrderStatusOrderByOrderTimeDesc(userId, status, pageable)
@@ -233,4 +237,4 @@ public class OrderServiceImpl {
                 .bodyToMono(Object.class)
                 .block();
     }
-}
+}

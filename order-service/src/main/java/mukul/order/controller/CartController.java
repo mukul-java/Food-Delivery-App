@@ -26,21 +26,21 @@ public class CartController {
     @PreAuthorize("hasAuthority('CART_READ')")
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public CartDto getCart(@PathVariable String userId) {
+    public CartDto getCart(@PathVariable Long userId) {
         return cartService.getCart(userId);
     }
 
     @PreAuthorize("hasAuthority('CART_WRITE')")
     @DeleteMapping("/{userId}/item/{foodItemId}")
     @ResponseStatus(HttpStatus.OK)
-    public CartDto removeFromCart(@PathVariable String userId, @PathVariable String foodItemId) {
+    public CartDto removeFromCart(@PathVariable Long userId, @PathVariable String foodItemId) {
         return cartService.removeFromCart(userId, foodItemId);
     }
 
     @PreAuthorize("hasAuthority('CART_WRITE')")
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void clearCart(@PathVariable String userId) {
+    public void clearCart(@PathVariable Long userId) {
         cartService.clearCart(userId);
     }
 }

@@ -23,7 +23,7 @@ public class OrderRequestDto {
         private Date deliveryTime;
         private OrderStatus orderStatus;
         private String paymentId;
-        private String userId;
+        private Long userId;
         private long totalOrders;
         private long deliveredOrders;
         private long pendingOrders;

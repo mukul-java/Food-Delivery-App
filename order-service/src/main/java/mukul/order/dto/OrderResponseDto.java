@@ -16,7 +16,7 @@ import java.util.List;
 public class OrderResponseDto {
     private Long orderNumber;
     private String restaurantId;
-    private String userId;
+    private Long userId;
     private List<OrderItemDto> orderItems;
     private BigDecimal totalAmount;
     private Date orderTime;

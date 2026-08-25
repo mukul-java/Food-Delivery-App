@@ -46,11 +46,11 @@ public class OrderController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<OrderResponseDto> getAllOrders(
-            @RequestParam(required = false) String userId,
+            @RequestParam(required = false) Long userId,
             @RequestParam(required = false) OrderStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize) {
-        if (userId != null && !userId.isBlank()) {
+        if (userId != null) {
             return orderService.getOrdersByUserId(userId, status, page, pageSize);
         }
         return orderService.getAllOrders(page, pageSize);
@@ -60,7 +60,7 @@ public class OrderController {
     @GetMapping("/user/{userId}")
     @ResponseStatus(HttpStatus.OK)
     public Page<OrderResponseDto> getOrdersByUserId(
-            @PathVariable String userId,
+            @PathVariable Long userId,
             @RequestParam(required = false) OrderStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize) {

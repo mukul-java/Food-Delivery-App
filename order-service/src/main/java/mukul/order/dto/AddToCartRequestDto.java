@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddToCartRequestDto {
-    private String userId;
+    private Long userId;
     private String restaurantId;
     private String foodItemId;
     private String name;

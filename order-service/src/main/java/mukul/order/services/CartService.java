@@ -4,8 +4,8 @@ import mukul.order.dto.AddToCartRequestDto;
 import mukul.order.dto.CartDto;
 
 public interface CartService {
-    CartDto getCart(String userId);
+    CartDto getCart(Long userId);
     CartDto addToCart(AddToCartRequestDto request);
-    CartDto removeFromCart(String userId, String foodItemId);
-    void clearCart(String userId);
+    CartDto removeFromCart(Long userId, String foodItemId);
+    void clearCart(Long userId);
 }

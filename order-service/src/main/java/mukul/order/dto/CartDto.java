@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CartDto {
     private String cartId;
-    private String userId;
+    private Long userId;
     private String restaurantId;
     
     @Builder.Default

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -48,8 +49,8 @@ public class FoodItemServiceImpl implements FoodItemService {
         // JPA relationship
         foodItem.setRestaurant(restaurant);
 
-        foodItem.setCreatedAt(new Date());
-        foodItem.setUpdatedAt(new Date());
+        foodItem.setCreatedAt(LocalDateTime.now());
+        foodItem.setUpdatedAt(LocalDateTime.now());
 
         FoodItem savedFoodItem = foodItemRepository.save(foodItem);
 
@@ -101,7 +102,7 @@ public class FoodItemServiceImpl implements FoodItemService {
         if (foodItemDto.getDescription() != null) foodItem.setDescription(foodItemDto.getDescription());
         if (foodItemDto.getPrice() != null) foodItem.setPrice(foodItemDto.getPrice());
         if (foodItemDto.getQuantity() != null) foodItem.setQuantity(foodItemDto.getQuantity());
-        foodItem.setUpdatedAt(new Date());
+        foodItem.setUpdatedAt(LocalDateTime.now());
 
         FoodItem updatedFoodItem = foodItemRepository.save(foodItem);
 
@@ -174,7 +175,7 @@ public class FoodItemServiceImpl implements FoodItemService {
                 .ifPresent(foodItem -> {
 
                     foodItem.setQuantity(foodItem.getQuantity() - quantity);
-                    foodItem.setUpdatedAt(new Date());
+                    foodItem.setUpdatedAt(LocalDateTime.now());
 
                     foodItemRepository.save(foodItem);
                 });
@@ -219,6 +220,7 @@ public class FoodItemServiceImpl implements FoodItemService {
 
         log.info("Order received at restaurant-service: {}", event);
 
+        // inventory management.
         updateFoodItemQuantity(
                 event.getFoodItemIds(),
                 event.getOrderQuantities()
